@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Remote HP</title>
+  <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 10px; }
+    video { width: 100%; border: 1px solid #ccc; }
+    input, button { padding: 8px; margin: 5px 0; }
+    #file-list { list-style: none; padding: 0; }
+    #file-list li { padding: 5px; border-bottom: 1px solid #eee; cursor: pointer; }
+    .folder { font-weight: bold; }
+    .file { color: blue; }
+  </style>
+</head>
+<body>
+  <h2>Hubungkan ke Laptop</h2>
+  <input type="text" id="remote-id" placeholder="Masukkan ID laptop">
+  <button id="connect">Hubungkan</button>
+  <button id="disconnect" disabled>Putuskan</button>
+  <p id="status"></p>
+  <video id="remote-screen" autoplay playsinline></video>
+
+  <h3>File Browser</h3>
+  <input type="text" id="folder-path" placeholder="Path (kosong = root)" value="">
+  <button id="list-btn">Lihat Isi Folder</button>
+  <ul id="file-list"></ul>
+  <a id="download-link" style="display:none">Unduh File</a>
+
+  <script>
+    let peer, call, dataConn;
+    const remoteScreen = document.getElementById('remote-screen');
+    const status = document.getElementById('status');
+
+    document.getElementById('connect').onclick = () => {
+      const remoteId = document.getElementById('remote-id').value.trim();
+      if (!remoteId) return alert('Masukkan ID laptop');
+      peer = new Peer();
+      peer.on('open', id => {
+        call = peer.call(remoteId, new MediaStream()); // dummy stream
+        call.on('stream', stream => {
+          remoteScreen.srcObject = stream;
+          remoteScreen.play();
+          status.textContent = 'Tersambung ke laptop.';
+          document.getElementById('disconnect').disabled = false;
+        });
+        dataConn = peer.connect(remoteId, { reliable: true });
+        dataConn.on('open', () => {
+          status.textContent += ' Data channel siap.';
+        });
+        dataConn.on('data', handleServerData);
+        call.on('close', () => status.textContent = 'Koneksi terputus.');
+      });
+    };
+
+    document.getElementById('disconnect').onclick = () => {
+      if (call) call.close();
+      if (dataConn) dataConn.close();
+      if (peer) peer.destroy();
+      remoteScreen.srcObject = null;
+    };
+
+    document.getElementById('list-btn').onclick = () => {
+      if (!dataConn) return alert('Belum terhubung.');
+      const path = document.getElementById('folder-path').value.trim();
+      dataConn.send({ type: 'list-files', path });
+    };
+
+    function handleServerData(data) {
+      if (data.type === 'file-list') {
+        renderFileList(data.entries);
+      } else if (data.type === 'file-meta') {
+        window._downloadMeta = data;
+        window._chunks = [];
+        status.textContent = `Mengunduh ${data.name}...`;
+      } else if (data.type === 'file-chunk') {
+        if (data.done) {
+          const blob = new Blob(window._chunks, { type: window._downloadMeta.mime });
+          const url = URL.createObjectURL(blob);
+          const a = document.getElementById('download-link');
+          a.href = url;
+          a.download = window._downloadMeta.name;
+          a.textContent = `Klik untuk menyimpan ${window._downloadMeta.name}`;
+          a.style.display = 'block';
+          status.textContent = 'Unduhan selesai.';
+          window._chunks = [];
+        } else {
+          window._chunks.push(new Uint8Array(data.data));
+        }
+      } else if (data.type === 'error') {
+        alert(data.msg);
+      }
+    }
+
+    function renderFileList(entries) {
+      const list = document.getElementById('file-list');
+      list.innerHTML = '';
+      entries.forEach(entry => {
+        const li = document.createElement('li');
+        li.textContent = entry.name;
+        li.className = entry.kind === 'directory' ? 'folder' : 'file';
+        li.onclick = () => {
+          if (entry.kind === 'directory') {
+            document.getElementById('folder-path').value = entry.path;
+            document.getElementById('list-btn').click();
+          } else {
+            if (!dataConn) return;
+            dataConn.send({ type: 'download-file', path: entry.path });
+          }
+        };
+        list.appendChild(li);
+      });
+    }
+  </script>
+</body>
+</html>
