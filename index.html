@@ -3,18 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Generator Remote + Lihat Device</title>
-  <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+  <title>Remote Center - Generator & Lihat Device</title>
+  <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js">
+  </script>
   <style>
+    /* ========== GLOBAL STYLE ========== */
     :root {
       --bg: #0a0a14;
-      --card: rgba(255,255,255,0.05);
+      --card: rgba(255, 255, 255, 0.05);
       --accent: #ff5e62;
       --accent2: #00d4ff;
       --text: #e0e0e0;
-      --border: rgba(255,255,255,0.1);
+      --border: rgba(255, 255, 255, 0.1);
     }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
     body {
       font-family: 'Segoe UI', system-ui, sans-serif;
       background: var(--bg);
@@ -33,7 +39,7 @@
       border: 1px solid var(--border);
       border-radius: 20px;
       padding: 30px 20px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
     }
     h1 {
       text-align: center;
@@ -44,7 +50,12 @@
       background-clip: text;
       margin-bottom: 5px;
     }
-    .subtitle { text-align: center; font-size: 12px; color: #888; margin-bottom: 20px; }
+    .subtitle {
+      text-align: center;
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 20px;
+    }
     .tabs {
       display: flex;
       gap: 10px;
@@ -55,21 +66,29 @@
       padding: 12px;
       text-align: center;
       border-radius: 10px;
-      background: rgba(255,255,255,0.03);
+      background: rgba(255, 255, 255, 0.03);
       border: 1px solid var(--border);
       cursor: pointer;
       font-weight: 600;
       transition: 0.2s;
+      user-select: none;
     }
     .tab.active {
-      background: rgba(255,94,98,0.2);
+      background: rgba(255, 94, 98, 0.2);
       border-color: var(--accent);
       color: var(--accent);
     }
-    .panel { display: none; }
-    .panel.active { display: block; }
+    .panel {
+      display: none;
+    }
+    .panel.active {
+      display: block;
+    }
 
-    .form-group { margin-bottom: 18px; }
+    /* ========== FORM ELEMENTS ========== */
+    .form-group {
+      margin-bottom: 18px;
+    }
     label {
       display: block;
       font-size: 13px;
@@ -79,651 +98,919 @@
       text-transform: uppercase;
       letter-spacing: 1px;
     }
-    .radio-group { display: flex; gap: 10px; }
+    .radio-group {
+      display: flex;
+      gap: 10px;
+    }
     .radio-option {
-      flex: 1; padding: 12px; border-radius: 10px;
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
       border: 1px solid var(--border);
-      background: rgba(255,255,255,0.03);
-      text-align: center; cursor: pointer;
-      transition: all 0.2s; font-weight: 500;
+      background: rgba(255, 255, 255, 0.03);
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 500;
     }
     .radio-option.selected {
-      background: rgba(255,94,98,0.2);
+      background: rgba(255, 94, 98, 0.2);
       border-color: var(--accent);
       color: var(--accent);
     }
-    .radio-option:hover { background: rgba(255,255,255,0.06); }
+    .radio-option:hover {
+      background: rgba(255, 255, 255, 0.06);
+    }
     input[type="text"] {
-      width: 100%; padding: 12px 15px;
-      border-radius: 10px; border: 1px solid var(--border);
-      background: rgba(0,0,0,0.3); color: white; font-size: 15px;
-      outline: none; transition: border 0.2s;
+      width: 100%;
+      padding: 12px 15px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(0, 0, 0, 0.3);
+      color: white;
+      font-size: 15px;
+      outline: none;
+      transition: border 0.2s;
     }
-    input[type="text"]:focus { border-color: var(--accent2); }
+    input[type="text"]:focus {
+      border-color: var(--accent2);
+    }
     .file-upload-area {
-      border: 2px dashed var(--border); border-radius: 10px;
-      padding: 20px; text-align: center; cursor: pointer;
-      transition: 0.2s; background: rgba(255,255,255,0.02); margin-top: 5px;
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.2s;
+      background: rgba(255, 255, 255, 0.02);
+      margin-top: 5px;
     }
-    .file-upload-area:hover { border-color: var(--accent2); background: rgba(255,255,255,0.05); }
+    .file-upload-area:hover {
+      border-color: var(--accent2);
+      background: rgba(255, 255, 255, 0.05);
+    }
     .gallery-preview {
-      display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
     }
     .gallery-preview img {
-      width: 60px; height: 60px; object-fit: cover; border-radius: 8px;
-      border: 1px solid var(--border); cursor: pointer;
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      cursor: pointer;
     }
-    .btn-row { display: flex; gap: 10px; margin-top: 10px; }
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
     button {
-      flex: 1; padding: 14px; border-radius: 10px;
-      border: none; font-weight: 600; font-size: 15px;
-      cursor: pointer; transition: all 0.2s; color: white;
+      flex: 1;
+      padding: 14px;
+      border-radius: 10px;
+      border: none;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: white;
     }
-    button:active { transform: scale(0.96); }
-    .btn-generate { background: rgba(255,255,255,0.1); }
-    .btn-download { background: linear-gradient(135deg, var(--accent), #ff9966); font-size: 16px; }
+    button:active {
+      transform: scale(0.96);
+    }
+    .btn-generate {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    .btn-download {
+      background: linear-gradient(135deg, var(--accent), #ff9966);
+      font-size: 16px;
+    }
     .toast {
-      position: fixed; bottom: 30px; left: 50%;
-      transform: translateX(-50%); background: #333; color: white;
-      padding: 12px 24px; border-radius: 30px; font-size: 13px;
-      font-weight: 600; z-index: 999;
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 600;
+      z-index: 999;
       animation: toastIn 0.3s ease, toastOut 0.3s ease 2s forwards;
       pointer-events: none;
     }
-    @keyframes toastIn { from { opacity:0; transform:translateX(-50%) translateY(20px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
-    @keyframes toastOut { from { opacity:1; } to { opacity:0; transform:translateX(-50%) translateY(-10px); } }
+    @keyframes toastIn {
+      from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+    }
+    @keyframes toastOut {
+      from {
+        opacity: 1;
+      }
+      to {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-10px);
+      }
+    }
     .preview-box {
-      background: rgba(0,0,0,0.3); border-radius: 10px; padding: 15px;
-      margin-top: 20px; border: 1px solid var(--border); display: none; text-align: center;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 15px;
+      margin-top: 20px;
+      border: 1px solid var(--border);
+      display: none;
+      text-align: center;
     }
-    .preview-box .status { color: #4caf50; font-weight: bold; }
-    code { color: var(--accent2); word-break: break-all; }
-    /* Client viewer styles (ringkas) */
+    .preview-box .status {
+      color: #4caf50;
+      font-weight: bold;
+    }
+    code {
+      color: var(--accent2);
+      word-break: break-all;
+    }
     .client-status {
-      padding: 10px; border-radius: 8px; margin: 10px 0; text-align: center;
+      padding: 10px;
+      border-radius: 8px;
+      margin: 10px 0;
+      text-align: center;
     }
-    .client-status.connected { background: rgba(76,175,80,0.2); color: #4caf50; }
-    .client-status.disconnected { background: rgba(244,67,54,0.2); color: #f44336; }
-    .client-status.connecting { background: rgba(255,193,7,0.2); color: #ffc107; }
-    .file-list { list-style: none; margin-top: 10px; }
+    .client-status.connected {
+      background: rgba(76, 175, 80, 0.2);
+      color: #4caf50;
+    }
+    .client-status.disconnected {
+      background: rgba(244, 67, 54, 0.2);
+      color: #f44336;
+    }
+    .client-status.connecting {
+      background: rgba(255, 193, 7, 0.2);
+      color: #ffc107;
+    }
+    .file-list {
+      list-style: none;
+      margin-top: 10px;
+    }
     .file-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.04);
-      cursor: pointer; border-radius: 6px; transition: 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      cursor: pointer;
+      border-radius: 6px;
+      transition: 0.2s;
     }
-    .file-item:hover { background: rgba(255,255,255,0.04); }
-    .file-item .ficon { font-size: 20px; }
-    .file-item .fname { flex: 1; }
-    .file-item .fsize { color: #999; font-size: 12px; }
+    .file-item:hover {
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .file-item .ficon {
+      font-size: 20px;
+    }
+    .file-item .fname {
+      flex: 1;
+    }
+    .file-item .fsize {
+      color: #999;
+      font-size: 12px;
+    }
     .download-box {
-      background: rgba(76,175,80,0.1); border-radius: 10px;
-      padding: 14px; margin-top: 10px; display: none; text-align: center;
+      background: rgba(76, 175, 80, 0.1);
+      border-radius: 10px;
+      padding: 14px;
+      margin-top: 10px;
+      display: none;
+      text-align: center;
     }
-    .download-box a { color: #4caf50; font-weight: bold; }
-    .note { font-size: 10px; color: #666; margin-top: 10px; text-align: center; }
+    .download-box a {
+      color: #4caf50;
+      font-weight: bold;
+    }
+    .note {
+      font-size: 10px;
+      color: #666;
+      margin-top: 10px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
-<div class="container">
-  <h1>🔧 Remote Center</h1>
-  <p class="subtitle">Buat file kustom + langsung lihat device</p>
+  <div class="container">
+    <h1>Remote Center</h1>
+    <p class="subtitle">Buat file kustom + langsung lihat device</p>
 
-  <div class="tabs">
-    <div class="tab active" data-tab="tab-create">🛠️ Buat File</div>
-    <div class="tab" data-tab="tab-view">👁️ Lihat Device</div>
-  </div>
+    <!-- TABS -->
+    <div class="tabs">
+      <div class="tab active" data-tab="tab-create">Buat File</div>
+      <div class="tab" data-tab="tab-view">Lihat Device</div>
+    </div>
 
-  <!-- TAB BUAT FILE -->
-  <div class="panel active" id="tab-create">
-    <div class="form-group">
-      <label>Pilih Tipe Shortcut</label>
-      <div class="radio-group" id="type-selector">
-        <div class="radio-option selected" data-type="host">
-          <span style="font-size:24px;">📱</span><br>Host (HP)
+    <!-- TAB BUAT FILE -->
+    <div class="panel active" id="tab-create">
+      <div class="form-group">
+        <label>Pilih Tipe Shortcut</label>
+        <div class="radio-group" id="type-selector">
+          <div class="radio-option selected" data-type="host">
+            <span style="font-size:24px;">📱</span><br>Host (HP)
+          </div>
+          <div class="radio-option" data-type="client">
+            <span style="font-size:24px;">💻</span><br>Client (Laptop)
+          </div>
         </div>
-        <div class="radio-option" data-type="client">
-          <span style="font-size:24px;">💻</span><br>Client (Laptop)
+      </div>
+
+      <div class="form-group">
+        <label>ID Koneksi</label>
+        <input type="text" id="custom-id" placeholder="Masukkan ID unik" value="bang-remote-2024">
+        <div class="btn-row">
+          <button class="btn-generate" id="btn-random">Acak</button>
+          <button class="btn-generate" id="btn-simple">Sederhana</button>
         </div>
+      </div>
+
+      <div class="form-group">
+        <label>Upload Logo (max 10 MB per file)</label>
+        <div class="file-upload-area" id="upload-area">
+          <span>Klik untuk pilih gambar</span>
+        </div>
+        <input type="file" id="image-input" accept="image/*" multiple style="display:none;">
+        <div class="gallery-preview" id="gallery-preview"></div>
+        <button class="btn-generate" id="btn-clear-images" style="display:none;">Hapus Semua Gambar</button>
+        <p class="note">Gambar akan ditanam di file HTML.</p>
+      </div>
+
+      <button class="btn-download" id="btn-download">Download File</button>
+
+      <div class="preview-box" id="preview-box">
+        <span class="status">File siap!</span><br>
+        <span id="preview-name"></span><br>
+        <small>ID: <code id="preview-id"></code></small>
       </div>
     </div>
 
-    <div class="form-group">
-      <label>ID Koneksi (harus sama di HP & Laptop)</label>
-      <input type="text" id="custom-id" placeholder="Masukkan ID unik" value="bang-remote-2024">
+    <!-- TAB LIHAT DEVICE -->
+    <div class="panel" id="tab-view">
+      <div class="form-group">
+        <label>ID Host (HP) yang ingin dilihat</label>
+        <input type="text" id="view-id" placeholder="Masukkan ID host">
+      </div>
       <div class="btn-row">
-        <button class="btn-generate" id="btn-random">🎲 Acak</button>
-        <button class="btn-generate" id="btn-simple">📝 Sederhana</button>
+        <button id="btn-connect-view" style="background:#00d4ff; color:#000;">Hubungkan</button>
       </div>
-    </div>
-
-    <div class="form-group">
-      <label>Upload Gambar (max 10 MB per file, untuk logo)</label>
-      <div class="file-upload-area" id="upload-area">
-        <span>🖼️ Klik untuk pilih gambar</span>
+      <div id="client-status" class="client-status disconnected">Belum terhubung</div>
+      <ul class="file-list" id="client-file-list"></ul>
+      <div class="download-box" id="client-dl-box">
+        <span id="client-dl-name"></span> (<span id="client-dl-size"></span>)<br>
+        <a id="client-dl-link" href="#" download>Simpan File</a>
       </div>
-      <input type="file" id="image-input" accept="image/*" multiple style="display:none;">
-      <div class="gallery-preview" id="gallery-preview"></div>
-      <button class="btn-generate" id="btn-clear-images" style="display:none;">🗑️ Hapus Semua Gambar</button>
-      <p class="note">Gambar akan ditanam di file HTML. Jika tidak ada, ikon bawaan akan dipakai.</p>
-    </div>
-
-    <button class="btn-download" id="btn-download">⬇️ Download File "Gambar"</button>
-
-    <div class="preview-box" id="preview-box">
-      <span class="status">✅ File siap!</span><br>
-      <span id="preview-name"></span><br>
-      <small>ID: <code id="preview-id"></code></small>
+      <p class="note">Gunakan tab ini untuk langsung melihat isi HP.</p>
     </div>
   </div>
 
-  <!-- TAB LIHAT DEVICE -->
-  <div class="panel" id="tab-view">
-    <div class="form-group">
-      <label>ID Host (HP) yang ingin dilihat</label>
-      <input type="text" id="view-id" placeholder="Masukkan ID host">
-    </div>
-    <div class="btn-row">
-      <button class="btn-download" id="btn-connect-view" style="background:#00d4ff; color:#000;">🔗 Hubungkan</button>
-    </div>
-    <div id="client-status" class="client-status disconnected">🔴 Belum terhubung</div>
-    <ul class="file-list" id="client-file-list"></ul>
-    <div class="download-box" id="client-dl-box">
-      ✅ <span id="client-dl-name"></span> (<span id="client-dl-size"></span>)<br>
-      <a id="client-dl-link" href="#" download>💾 Simpan File</a>
-    </div>
-    <p class="note">Gunakan tab ini untuk langsung melihat isi HP tanpa download file.</p>
-  </div>
-</div>
+  <!-- ==================== JAVASCRIPT ==================== -->
+  <script>
+    (function() {
+      // ========== STATE ==========
+      let selectedType = 'host';
+      let imagesBase64 = [];
+      const MAX_SIZE_MB = 10;
 
-<script>
-  // ========== State ==========
-  let selectedType = 'host';
-  let imagesBase64 = [];
-  const MAX_SIZE_MB = 10;
-
-  // ========== Tab switching ==========
-  document.querySelectorAll('.tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-      document.getElementById(tab.dataset.tab).classList.add('active');
-    });
-  });
-
-  // ========== BUAT FILE LOGIC ==========
-  const typeOptions = document.querySelectorAll('#type-selector .radio-option');
-  const idInput = document.getElementById('custom-id');
-  const btnRandom = document.getElementById('btn-random');
-  const btnSimple = document.getElementById('btn-simple');
-  const uploadArea = document.getElementById('upload-area');
-  const imageInput = document.getElementById('image-input');
-  const galleryPreview = document.getElementById('gallery-preview');
-  const btnClearImages = document.getElementById('btn-clear-images');
-  const btnDownload = document.getElementById('btn-download');
-  const previewBox = document.getElementById('preview-box');
-  const previewName = document.getElementById('preview-name');
-  const previewId = document.getElementById('preview-id');
-
-  typeOptions.forEach(opt => {
-    opt.addEventListener('click', () => {
-      typeOptions.forEach(o => o.classList.remove('selected'));
-      opt.classList.add('selected');
-      selectedType = opt.dataset.type;
-    });
-  });
-
-  btnRandom.addEventListener('click', () => {
-    idInput.value = 'rem-' + Math.random().toString(36).substring(2,10) + '-' + Date.now().toString(36);
-  });
-  btnSimple.addEventListener('click', () => {
-    const val = prompt('Masukkan ID sederhana:', 'keluarga-2024');
-    if (val && val.trim()) idInput.value = val.trim().replace(/\s+/g, '-');
-  });
-
-  uploadArea.addEventListener('click', () => imageInput.click());
-  imageInput.addEventListener('change', handleImageSelect);
-  btnClearImages.addEventListener('click', () => {
-    imagesBase64 = [];
-    renderGallery();
-  });
-
-  function handleImageSelect(e) {
-    const files = Array.from(e.target.files);
-    files.forEach(file => {
-      if (file.size > MAX_SIZE_MB * 1024 * 1024) {
-        alert(`Gambar ${file.name} terlalu besar (>${MAX_SIZE_MB}MB), dilewati.`);
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        imagesBase64.push(ev.target.result);
-        renderGallery();
-      };
-      reader.readAsDataURL(file);
-    });
-    e.target.value = '';
-  }
-
-  function renderGallery() {
-    galleryPreview.innerHTML = '';
-    if (imagesBase64.length === 0) {
-      btnClearImages.style.display = 'none';
-      uploadArea.querySelector('span').textContent = '🖼️ Klik untuk pilih gambar';
-      return;
-    }
-    btnClearImages.style.display = 'block';
-    uploadArea.querySelector('span').textContent = `✅ ${imagesBase64.length} gambar dipilih`;
-    imagesBase64.forEach((img, idx) => {
-      const el = document.createElement('img');
-      el.src = img;
-      el.title = `Gambar ${idx+1}`;
-      el.addEventListener('click', () => {
-        imagesBase64.splice(idx, 1);
-        renderGallery();
+      // ========== TAB SWITCHING ==========
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          this.classList.add('active');
+          document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+          document.getElementById(this.dataset.tab).classList.add('active');
+        });
       });
-      galleryPreview.appendChild(el);
-    });
-  }
 
-  btnDownload.addEventListener('click', () => {
-    const id = idInput.value.trim() || 'default-' + Date.now();
-    const fileContent = selectedType === 'host' ? getHostHTML(id, imagesBase64) : getClientHTML(id, imagesBase64);
-    const fileName = selectedType === 'host' ? 'HP-Host-Remote.html' : 'Laptop-Client-Remote.html';
+      // ========== BUAT FILE LOGIC ==========
+      const typeOptions = document.querySelectorAll('#type-selector .radio-option');
+      const idInput = document.getElementById('custom-id');
+      const btnRandom = document.getElementById('btn-random');
+      const btnSimple = document.getElementById('btn-simple');
+      const uploadArea = document.getElementById('upload-area');
+      const imageInput = document.getElementById('image-input');
+      const galleryPreview = document.getElementById('gallery-preview');
+      const btnClearImages = document.getElementById('btn-clear-images');
+      const btnDownload = document.getElementById('btn-download');
+      const previewBox = document.getElementById('preview-box');
+      const previewName = document.getElementById('preview-name');
+      const previewId = document.getElementById('preview-id');
 
-    const blob = new Blob([fileContent], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = fileName;
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+      // Pilih tipe
+      typeOptions.forEach(opt => {
+        opt.addEventListener('click', function() {
+          typeOptions.forEach(o => o.classList.remove('selected'));
+          this.classList.add('selected');
+          selectedType = this.dataset.type;
+        });
+      });
 
-    previewBox.style.display = 'block';
-    previewName.textContent = fileName;
-    previewId.textContent = id;
-    showToast('✅ File berhasil didownload!');
-  });
+      // ID acak
+      btnRandom.addEventListener('click', function() {
+        idInput.value = 'rem-' + Math.random().toString(36).substring(2, 10) + '-' + Date.now().toString(36);
+      });
 
-  // ========== Template untuk host & client (disertakan logo) ==========
-  function getHostHTML(id, images) {
-    const galleryHTML = images.length > 0 ? 
-      images.map(img => `<img src="${img}" style="max-width:100px;border-radius:12px;margin:5px;">`).join('') : 
-      '<div class="icon-big">📱</div>';
-    return `<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>HP Remote - ${id}</title>
-  <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"><\/script>
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0a14;color:#e0e0e0;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:16px}
-    .app{max-width:440px;width:100%;text-align:center}
-    .icon-big{font-size:60px;margin-bottom:12px}
-    h1{font-size:24px;font-weight:700;background:linear-gradient(135deg,#ff5e62,#ff9966);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px}
-    .subtitle{font-size:12px;color:#999;margin-bottom:20px}
-    .card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:18px;margin:12px 0;text-align:left}
-    .card-title{font-size:12px;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
-    .status-badge{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:600;margin:8px 0}
-    .status-badge.waiting{background:rgba(255,193,7,0.15);color:#ffc107}
-    .status-badge.connected{background:rgba(76,175,80,0.15);color:#4caf50}
-    .status-badge.error{background:rgba(244,67,54,0.15);color:#f44336}
-    .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
-    .dot.green{background:#4caf50;animation:pulse 2s infinite}
-    .dot.yellow{background:#ffc107;animation:pulse 2s infinite}
-    .dot.red{background:#f44336}
-    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-    .btn{width:100%;padding:14px;border-radius:12px;border:none;font-size:15px;font-weight:600;cursor:pointer;margin:6px 0;display:flex;align-items:center;justify-content:center;gap:8px;color:white;transition:all 0.2s}
-    .btn:active{transform:scale(0.96);opacity:0.9}
-    .btn-primary{background:linear-gradient(135deg,#ff5e62,#ff9966)}
-    .btn-secondary{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15)}
-    .btn-danger{background:rgba(244,67,54,0.3);font-size:13px}
-    .btn-row{display:flex;gap:8px}
-    .btn-row .btn{flex:1}
-    .file-list{max-height:250px;overflow-y:auto;margin:8px 0;border-radius:10px;text-align:left}
-    .file-item{display:flex;align-items:center;gap:10px;padding:10px;background:rgba(255,255,255,0.03);border-radius:10px;margin:4px 0}
-    .file-item .ficon{font-size:24px;width:30px;text-align:center}
-    .file-item .finfo{flex:1}
-    .file-item .fname{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .file-item .fmeta{font-size:10px;color:#999}
-    .file-item .fdel{width:28px;height:28px;border-radius:50%;background:rgba(244,67,54,0.2);border:none;color:#f44336;font-size:14px;cursor:pointer}
-    .empty-state{text-align:center;padding:25px;color:#999}
-  </style>
-</head>
-<body>
-<div class="app">
-  ${galleryHTML}
-  <h1>HP Remote</h1>
-  <p class="subtitle">Auto-connect &bull; ID: ${id}</p>
-  <div id="status-badge" class="status-badge waiting"><span class="dot yellow"></span> Menunggu laptop...</div>
-  <div class="card">
-    <div class="card-title">📎 File Dibagikan</div>
-    <div class="btn-row">
-      <button class="btn btn-secondary" id="btn-file">📄 Pilih File</button>
-      <button class="btn btn-secondary" id="btn-folder">📁 Folder</button>
-    </div>
-    <div class="file-list" id="file-list"><div class="empty-state">📭 Belum ada file</div></div>
-    <button class="btn btn-danger" id="btn-clear" style="display:none">🗑️ Hapus Semua</button>
-  </div>
-  <p style="font-size:10px;color:#555">Jangan tutup halaman ini</p>
-</div>
-<input type="file" id="file-input" multiple style="display:none" accept="*/*">
-<input type="file" id="folder-input" webkitdirectory style="display:none">
-<script>
-  const FIXED_ID = '${id}';
-  const peer = new Peer(FIXED_ID);
-  let dataConnection = null;
-  let sharedFiles = [];
-  const statusBadge = document.getElementById('status-badge');
-  const fileListEl = document.getElementById('file-list');
-  const fileInput = document.getElementById('file-input');
-  const folderInput = document.getElementById('folder-input');
-  const btnClear = document.getElementById('btn-clear');
-  peer.on('open', () => {
-    statusBadge.className = 'status-badge waiting';
-    statusBadge.innerHTML = '<span class="dot yellow"></span> Menunggu laptop...';
-  });
-  peer.on('connection', (conn) => {
-    dataConnection = conn;
-    statusBadge.className = 'status-badge connected';
-    statusBadge.innerHTML = '<span class="dot green"></span> Laptop terhubung!';
-    conn.on('data', (data) => {
-      if (data.type === 'list-files') {
-        conn.send({ type: 'file-list', entries: sharedFiles.map((f,i) => ({index:i, name:f.name, size:f.size, mime:f.mime})) });
-      } else if (data.type === 'download-file') {
-        const f = sharedFiles[data.index];
-        if (f) {
-          conn.send({ type: 'file-meta', name: f.name, size: f.size, mime: f.mime });
-          const bytes = new Uint8Array(f.data);
-          let offset = 0;
-          function send() {
-            if (offset >= bytes.length) { conn.send({ type: 'file-chunk', done: true }); return; }
-            conn.send({ type: 'file-chunk', data: Array.from(bytes.slice(offset, offset+65536)) });
-            offset += 65536;
-            setTimeout(send, 10);
-          }
-          send();
+      // ID sederhana
+      btnSimple.addEventListener('click', function() {
+        const val = prompt('Masukkan ID sederhana:', 'keluarga-2024');
+        if (val && val.trim()) {
+          idInput.value = val.trim().replace(/\s+/g, '-');
         }
-      }
-    });
-    conn.on('close', () => {
-      dataConnection = null;
-      statusBadge.className = 'status-badge waiting';
-      statusBadge.innerHTML = '<span class="dot yellow"></span> Menunggu laptop...';
-    });
-  });
-  document.getElementById('btn-file').onclick = () => fileInput.click();
-  document.getElementById('btn-folder').onclick = () => folderInput.click();
-  fileInput.onchange = async () => { await addFiles(Array.from(fileInput.files)); fileInput.value = ''; };
-  folderInput.onchange = async () => { await addFiles(Array.from(folderInput.files)); folderInput.value = ''; };
-  btnClear.onclick = () => { sharedFiles = []; render(); };
-  async function addFiles(files) {
-    for (const file of files) {
-      if (sharedFiles.find(f=>f.name===file.name&&f.size===file.size)) continue;
-      if (file.size > 200*1024*1024) { alert('File terlalu besar: '+file.name); continue; }
-      sharedFiles.push({ name: file.name, size: file.size, mime: file.type||'application/octet-stream', data: await file.arrayBuffer() });
-    }
-    render();
-  }
-  function deleteFile(i) { sharedFiles.splice(i,1); render(); }
-  function render() {
-    if (sharedFiles.length === 0) {
-      fileListEl.innerHTML = '<div class="empty-state">📭 Belum ada file</div>';
-      btnClear.style.display = 'none';
-      return;
-    }
-    fileListEl.innerHTML = sharedFiles.map((f,i) => '<div class="file-item"><span class="ficon">📎</span><div class="finfo"><div class="fname">'+f.name+'</div><div class="fmeta">'+formatSize(f.size)+'</div></div><button class="fdel" onclick="deleteFile('+i+')">✕</button></div>').join('');
-    btnClear.style.display = 'block';
-  }
-  function formatSize(b) { const u=['B','KB','MB','GB']; const i=Math.floor(Math.log(b)/Math.log(1024)); return (b/Math.pow(1024,i)).toFixed(1)+' '+u[i]; }
-<\/script>
-</body>
-</html>`;
-  }
-
-  function getClientHTML(id, images) {
-    const galleryHTML = images.length > 0 ?
-      images.map(img => `<img src="${img}" style="max-width:100px;border-radius:12px;margin:5px;">`).join('') :
-      '<div class="icon" style="font-size:48px;">💻</div>';
-    return `<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Laptop Client - ${id}</title>
-  <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"><\/script>
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:'Segoe UI',system-ui,sans-serif;background:#0f0f1a;color:#e0e0e0;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
-    .app{max-width:650px;width:100%}
-    .header{text-align:center;margin-bottom:20px}
-    .header h1{font-size:24px;color:#00d4ff;margin:8px 0}
-    .header .sub{font-size:12px;color:#999}
-    .status-badge{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:20px;font-size:14px;font-weight:600;margin:10px auto;width:fit-content}
-    .status-badge.connecting{background:rgba(255,193,7,0.15);color:#ffc107}
-    .status-badge.connected{background:rgba(76,175,80,0.15);color:#4caf50}
-    .status-badge.disconnected{background:rgba(244,67,54,0.15);color:#f44336}
-    .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
-    .dot.green{background:#4caf50;animation:pulse 2s infinite}
-    .dot.yellow{background:#ffc107;animation:pulse 2s infinite}
-    .dot.red{background:#f44336}
-    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-    .card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:18px;margin:10px 0}
-    .btn{padding:12px 20px;border-radius:10px;border:none;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;color:white}
-    .btn:active{transform:scale(0.96)}
-    .btn-connect{background:#00d4ff;color:#000}
-    .btn-refresh{background:rgba(255,255,255,0.1)}
-    .btn-row{display:flex;gap:8px;margin:10px 0;justify-content:center}
-    .file-list{list-style:none}
-    .file-item{display:flex;align-items:center;gap:10px;padding:12px;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer;border-radius:6px;transition:0.2s}
-    .file-item:hover{background:rgba(255,255,255,0.04)}
-    .file-item .ficon{font-size:22px}
-    .file-item .fname{flex:1;font-size:14px}
-    .file-item .fsize{color:#999;font-size:11px}
-    .loading{text-align:center;padding:20px;color:#ffc107;display:none}
-    .empty{text-align:center;padding:30px;color:#999}
-    .download-box{background:rgba(76,175,80,0.1);border-radius:10px;padding:14px;margin-top:10px;display:none;text-align:center}
-    .download-box a{color:#4caf50;font-weight:bold}
-    .info-text{text-align:center;font-size:10px;color:#555;margin-top:15px}
-  </style>
-</head>
-<body>
-<div class="app">
-  <div class="header">
-    ${galleryHTML}
-    <h1>Akses File HP</h1>
-    <p class="sub">Auto-connect &bull; ID: ${id}</p>
-  </div>
-  <div style="text-align:center">
-    <div id="status-badge" class="status-badge disconnected"><span class="dot red"></span> <span id="status-text">🔴 Belum terhubung</span></div>
-  </div>
-  <div class="btn-row">
-    <button class="btn btn-connect" id="btn-connect">🔗 Hubungkan ke HP</button>
-    <button class="btn btn-refresh" id="btn-refresh">🔄 Refresh File</button>
-  </div>
-  <div class="card">
-    <div class="loading" id="loading">⏳ Menghubungkan...</div>
-    <ul class="file-list" id="file-list"></ul>
-    <div class="empty" id="empty">👆 Klik "Hubungkan ke HP" untuk mulai</div>
-  </div>
-  <div class="download-box" id="dl-box">
-    ✅ <span id="dl-name"></span> (<span id="dl-size"></span>)<br>
-    <a id="dl-link" href="#" download>💾 Klik untuk menyimpan file</a>
-  </div>
-  <p class="info-text">ID tertanam: ${id}</p>
-</div>
-<script>
-  const FIXED_ID = '${id}';
-  let peer, conn, _chunks = [], _meta = null;
-  const statusBadge = document.getElementById('status-badge');
-  const statusText = document.getElementById('status-text');
-  const loading = document.getElementById('loading');
-  const fileListEl = document.getElementById('file-list');
-  const emptyEl = document.getElementById('empty');
-  const dlBox = document.getElementById('dl-box');
-  const dlName = document.getElementById('dl-name');
-  const dlSize = document.getElementById('dl-size');
-  const dlLink = document.getElementById('dl-link');
-  function updateStatus(type, text) {
-    statusBadge.className = 'status-badge ' + type;
-    statusText.textContent = text;
-  }
-  function connect() {
-    if (peer) peer.destroy();
-    updateStatus('connecting', '🟡 Menghubungkan...');
-    loading.style.display = 'block';
-    fileListEl.innerHTML = '';
-    emptyEl.style.display = 'none';
-    dlBox.style.display = 'none';
-    peer = new Peer();
-    peer.on('open', () => {
-      conn = peer.connect(FIXED_ID, { reliable: true });
-      conn.on('open', () => {
-        updateStatus('connected', '🟢 Terhubung ke HP!');
-        loading.style.display = 'none';
-        document.getElementById('btn-connect').textContent = '🔄 Reconnect';
-        conn.send({ type: 'list-files' });
       });
-      conn.on('data', (d) => {
-        loading.style.display = 'none';
-        if (d.type === 'file-list') {
-          fileListEl.innerHTML = '';
-          if (!d.entries?.length) { fileListEl.innerHTML = '<div class="empty">📭 Tidak ada file di HP</div>'; return; }
-          d.entries.forEach(e => {
-            const li = document.createElement('li');
-            li.className = 'file-item';
-            li.innerHTML = '<span class="ficon">📎</span><span class="fname">'+e.name+'</span><span class="fsize">'+fmtSize(e.size)+'</span>';
-            li.onclick = () => { conn.send({ type: 'download-file', index: e.index }); li.innerHTML += '<span style="color:#ffc107"> ⏳</span>'; };
-            fileListEl.appendChild(li);
+
+      // Upload gambar
+      uploadArea.addEventListener('click', function() {
+        imageInput.click();
+      });
+
+      imageInput.addEventListener('change', handleImageSelect);
+      btnClearImages.addEventListener('click', function() {
+        imagesBase64 = [];
+        renderGallery();
+      });
+
+      function handleImageSelect(e) {
+        const files = Array.from(e.target.files);
+        files.forEach(file => {
+          if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+            alert('Gambar ' + file.name + ' terlalu besar (>' + MAX_SIZE_MB + 'MB), dilewati.');
+            return;
+          }
+          const reader = new FileReader();
+          reader.onload = function(ev) {
+            imagesBase64.push(ev.target.result);
+            renderGallery();
+          };
+          reader.readAsDataURL(file);
+        });
+        e.target.value = '';
+      }
+
+      function renderGallery() {
+        galleryPreview.innerHTML = '';
+        if (imagesBase64.length === 0) {
+          btnClearImages.style.display = 'none';
+          uploadArea.querySelector('span').textContent = 'Klik untuk pilih gambar';
+          return;
+        }
+        btnClearImages.style.display = 'block';
+        uploadArea.querySelector('span').textContent = imagesBase64.length + ' gambar dipilih';
+        imagesBase64.forEach((img, idx) => {
+          const el = document.createElement('img');
+          el.src = img;
+          el.title = 'Gambar ' + (idx + 1);
+          el.addEventListener('click', function() {
+            imagesBase64.splice(idx, 1);
+            renderGallery();
           });
-        } else if (d.type === 'file-meta') {
-          _meta = d; _chunks = [];
-          updateStatus('connected', '📥 Downloading: '+d.name);
-        } else if (d.type === 'file-chunk') {
-          if (d.done) {
-            const blob = new Blob(_chunks, { type: _meta.mime });
-            dlLink.href = URL.createObjectURL(blob);
-            dlLink.download = _meta.name;
-            dlName.textContent = _meta.name;
-            dlSize.textContent = fmtSize(_meta.size);
-            dlBox.style.display = 'block';
-            updateStatus('connected', '✅ Selesai: '+_meta.name);
-            _chunks = [];
-          } else if (d.data) { _chunks.push(new Uint8Array(d.data)); }
-        } else if (d.type === 'error') { alert('⚠️ '+d.msg); }
-      });
-      conn.on('close', () => {
-        updateStatus('disconnected', '🔴 Terputus');
-        loading.style.display = 'none';
-        document.getElementById('btn-connect').textContent = '🔗 Hubungkan ke HP';
-        fileListEl.innerHTML = '<div class="empty">🔴 Koneksi terputus. Klik Hubungkan lagi.</div>';
-      });
-    });
-    peer.on('error', (err) => {
-      updateStatus('disconnected', '❌ '+err.message);
-      loading.style.display = 'none';
-    });
-  }
-  document.getElementById('btn-connect').onclick = connect;
-  document.getElementById('btn-refresh').onclick = () => {
-    if (conn && conn.open) { loading.style.display = 'block'; conn.send({ type: 'list-files' }); }
-    else connect();
-  };
-  function fmtSize(b) { const u=['B','KB','MB','GB']; const i=Math.floor(Math.log(b)/Math.log(1024)); return (b/Math.pow(1024,i)).toFixed(1)+' '+u[i]; }
-  window.addEventListener('load', () => setTimeout(connect, 1000));
-<\/script>
-</body>
-</html>`;
-  }
-
-  // ========== LIHAT DEVICE LOGIC (Client built-in) ==========
-  let viewPeer, viewConn, viewChunks = [], viewMeta = null;
-  const btnConnectView = document.getElementById('btn-connect-view');
-  const viewIdInput = document.getElementById('view-id');
-  const clientStatus = document.getElementById('client-status');
-  const clientFileList = document.getElementById('client-file-list');
-  const clientDlBox = document.getElementById('client-dl-box');
-  const clientDlName = document.getElementById('client-dl-name');
-  const clientDlSize = document.getElementById('client-dl-size');
-  const clientDlLink = document.getElementById('client-dl-link');
-
-  btnConnectView.addEventListener('click', () => {
-    const id = viewIdInput.value.trim();
-    if (!id) return alert('Masukkan ID host!');
-    if (viewPeer) viewPeer.destroy();
-    clientStatus.className = 'client-status connecting';
-    clientStatus.textContent = '🟡 Menghubungkan...';
-    clientFileList.innerHTML = '';
-    clientDlBox.style.display = 'none';
-    viewPeer = new Peer();
-    viewPeer.on('open', () => {
-      viewConn = viewPeer.connect(id, { reliable: true });
-      viewConn.on('open', () => {
-        clientStatus.className = 'client-status connected';
-        clientStatus.textContent = '🟢 Terhubung!';
-        viewConn.send({ type: 'list-files' });
-      });
-      viewConn.on('data', handleViewData);
-      viewConn.on('close', () => {
-        clientStatus.className = 'client-status disconnected';
-        clientStatus.textContent = '🔴 Terputus';
-      });
-    });
-    viewPeer.on('error', err => {
-      clientStatus.className = 'client-status disconnected';
-      clientStatus.textContent = '❌ ' + err.message;
-    });
-  });
-
-  function handleViewData(d) {
-    if (d.type === 'file-list') {
-      clientFileList.innerHTML = '';
-      if (!d.entries?.length) {
-        clientFileList.innerHTML = '<div style="padding:20px;text-align:center;color:#999;">📭 Tidak ada file</div>';
-        return;
+          galleryPreview.appendChild(el);
+        });
       }
-      d.entries.forEach(e => {
-        const li = document.createElement('li');
-        li.className = 'file-item';
-        li.innerHTML = `<span class="ficon">📎</span><span class="fname">${e.name}</span><span class="fsize">${fmtSize(e.size)}</span>`;
-        li.onclick = () => {
-          viewConn.send({ type: 'download-file', index: e.index });
-        };
-        clientFileList.appendChild(li);
+
+      // Download file
+      btnDownload.addEventListener('click', function() {
+        const id = idInput.value.trim() || 'default-' + Date.now();
+        const fileContent = selectedType === 'host' ? getHostHTML(id, imagesBase64) : getClientHTML(id, imagesBase64);
+        const fileName = selectedType === 'host' ? 'HP-Host-Remote.html' : 'Laptop-Client-Remote.html';
+
+        const blob = new Blob([fileContent], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        previewBox.style.display = 'block';
+        previewName.textContent = fileName;
+        previewId.textContent = id;
+        showToast('File berhasil didownload!');
       });
-    } else if (d.type === 'file-meta') {
-      viewMeta = d; viewChunks = [];
-    } else if (d.type === 'file-chunk') {
-      if (d.done) {
-        const blob = new Blob(viewChunks, { type: viewMeta.mime });
-        clientDlLink.href = URL.createObjectURL(blob);
-        clientDlLink.download = viewMeta.name;
-        clientDlName.textContent = viewMeta.name;
-        clientDlSize.textContent = fmtSize(viewMeta.size);
-        clientDlBox.style.display = 'block';
-        viewChunks = [];
-      } else if (d.data) {
-        viewChunks.push(new Uint8Array(d.data));
+
+      // ========== TEMPLATE HOST (DENGAN PERBAIKAN PILIH FILE/FOLDER) ==========
+      function getHostHTML(id, images) {
+        const galleryHTML = images.length > 0 ?
+          images.map(img => '<img src="' + img + '" style="max-width:100px;border-radius:12px;margin:5px;">').join('') :
+          '<div class="icon-big">📱</div>';
+
+        return '<!DOCTYPE html>\n' +
+          '<html lang="id">\n' +
+          '<head>\n' +
+          '  <meta charset="UTF-8">\n' +
+          '  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">\n' +
+          '  <title>HP Remote - ' + id + '</title>\n' +
+          '  <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"><\/script>\n' +
+          '  <style>\n' +
+          '    *{margin:0;padding:0;box-sizing:border-box}\n' +
+          '    body{font-family:\'Segoe UI\',system-ui,sans-serif;background:#0a0a14;color:#e0e0e0;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:16px}\n' +
+          '    .app{max-width:440px;width:100%;text-align:center}\n' +
+          '    .icon-big{font-size:60px;margin-bottom:12px}\n' +
+          '    h1{font-size:24px;font-weight:700;background:linear-gradient(135deg,#ff5e62,#ff9966);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px}\n' +
+          '    .subtitle{font-size:12px;color:#999;margin-bottom:20px}\n' +
+          '    .card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:18px;margin:12px 0;text-align:left}\n' +
+          '    .card-title{font-size:12px;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}\n' +
+          '    .status-badge{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:600;margin:8px 0}\n' +
+          '    .status-badge.waiting{background:rgba(255,193,7,0.15);color:#ffc107}\n' +
+          '    .status-badge.connected{background:rgba(76,175,80,0.15);color:#4caf50}\n' +
+          '    .status-badge.error{background:rgba(244,67,54,0.15);color:#f44336}\n' +
+          '    .dot{width:8px;height:8px;border-radius:50%;display:inline-block}\n' +
+          '    .dot.green{background:#4caf50;animation:pulse 2s infinite}\n' +
+          '    .dot.yellow{background:#ffc107;animation:pulse 2s infinite}\n' +
+          '    .dot.red{background:#f44336}\n' +
+          '    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}\n' +
+          '    .btn{width:100%;padding:14px;border-radius:12px;border:none;font-size:15px;font-weight:600;cursor:pointer;margin:6px 0;display:flex;align-items:center;justify-content:center;gap:8px;color:white;transition:all 0.2s}\n' +
+          '    .btn:active{transform:scale(0.96);opacity:0.9}\n' +
+          '    .btn-primary{background:linear-gradient(135deg,#ff5e62,#ff9966)}\n' +
+          '    .btn-secondary{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15)}\n' +
+          '    .btn-danger{background:rgba(244,67,54,0.3);font-size:13px}\n' +
+          '    .btn-row{display:flex;gap:8px}\n' +
+          '    .btn-row .btn{flex:1}\n' +
+          '    .file-list{max-height:250px;overflow-y:auto;margin:8px 0;border-radius:10px;text-align:left}\n' +
+          '    .file-item{display:flex;align-items:center;gap:10px;padding:10px;background:rgba(255,255,255,0.03);border-radius:10px;margin:4px 0}\n' +
+          '    .file-item .ficon{font-size:24px;width:30px;text-align:center}\n' +
+          '    .file-item .finfo{flex:1}\n' +
+          '    .file-item .fname{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n' +
+          '    .file-item .fmeta{font-size:10px;color:#999}\n' +
+          '    .file-item .fdel{width:28px;height:28px;border-radius:50%;background:rgba(244,67,54,0.2);border:none;color:#f44336;font-size:14px;cursor:pointer}\n' +
+          '    .empty-state{text-align:center;padding:25px;color:#999}\n' +
+          '  </style>\n' +
+          '</head>\n' +
+          '<body>\n' +
+          '<div class="app">\n' +
+          '  ' + galleryHTML + '\n' +
+          '  <h1>HP Remote</h1>\n' +
+          '  <p class="subtitle">ID: <span id="display-id">' + id + '</span> &bull; Auto-connect</p>\n' +
+          '  <div id="status-badge" class="status-badge waiting"><span class="dot yellow"></span> Menunggu laptop...</div>\n' +
+          '  <div class="card">\n' +
+          '    <div class="card-title">📎 File Dibagikan</div>\n' +
+          '    <div class="btn-row">\n' +
+          '      <button class="btn btn-secondary" id="btn-file">📄 Pilih File</button>\n' +
+          '      <button class="btn btn-secondary" id="btn-folder">📁 Pilih Folder</button>\n' +
+          '    </div>\n' +
+          '    <div class="file-list" id="file-list"><div class="empty-state">📭 Belum ada file</div></div>\n' +
+          '    <button class="btn btn-danger" id="btn-clear" style="display:none">🗑️ Hapus Semua</button>\n' +
+          '  </div>\n' +
+          '  <p style="font-size:10px;color:#555;margin-top:8px;">Jangan tutup halaman ini</p>\n' +
+          '</div>\n' +
+          '<input type="file" id="file-input" multiple style="display:none" accept="*/*">\n' +
+          '<input type="file" id="folder-input" webkitdirectory style="display:none" directory>\n' +
+          '<script>\n' +
+          '  (function() {\n' +
+          '    var FIXED_ID = "' + id + '";\n' +
+          '    document.getElementById("display-id").textContent = FIXED_ID;\n' +
+          '    var peer = new Peer(FIXED_ID);\n' +
+          '    var dataConnection = null;\n' +
+          '    var sharedFiles = [];\n' +
+          '    var statusBadge = document.getElementById("status-badge");\n' +
+          '    var fileListEl = document.getElementById("file-list");\n' +
+          '    var fileInput = document.getElementById("file-input");\n' +
+          '    var folderInput = document.getElementById("folder-input");\n' +
+          '    var btnClear = document.getElementById("btn-clear");\n' +
+          '\n' +
+          '    async function addFiles(files) {\n' +
+          '      for (var i = 0; i < files.length; i++) {\n' +
+          '        var file = files[i];\n' +
+          '        var exists = sharedFiles.some(function(f) { return f.name === file.name && f.size === file.size; });\n' +
+          '        if (exists) continue;\n' +
+          '        if (file.size > 200 * 1024 * 1024) {\n' +
+          '          alert("File \\"" + file.name + "\\" terlalu besar (>200MB), dilewati.");\n' +
+          '          continue;\n' +
+          '        }\n' +
+          '        var buffer = await file.arrayBuffer();\n' +
+          '        sharedFiles.push({\n' +
+          '          name: file.name,\n' +
+          '          size: file.size,\n' +
+          '          mime: file.type || "application/octet-stream",\n' +
+          '          data: buffer\n' +
+          '        });\n' +
+          '      }\n' +
+          '      render();\n' +
+          '    }\n' +
+          '\n' +
+          '    function render() {\n' +
+          '      if (sharedFiles.length === 0) {\n' +
+          '        fileListEl.innerHTML = "<div class=\\"empty-state\\">📭 Belum ada file</div>";\n' +
+          '        btnClear.style.display = "none";\n' +
+          '        return;\n' +
+          '      }\n' +
+          '      var html = "";\n' +
+          '      for (var i = 0; i < sharedFiles.length; i++) {\n' +
+          '        var f = sharedFiles[i];\n' +
+          '        html += "<div class=\\"file-item\\">";\n' +
+          '        html += "<span class=\\"ficon\\">📎</span>";\n' +
+          '        html += "<div class=\\"finfo\\">";\n' +
+          '        html += "<div class=\\"fname\\">" + f.name + "</div>";\n' +
+          '        html += "<div class=\\"fmeta\\">" + formatSize(f.size) + "</div>";\n' +
+          '        html += "</div>";\n' +
+          '        html += "<button class=\\"fdel\\" data-index=\\"" + i + "\\">✕</button>";\n' +
+          '        html += "</div>";\n' +
+          '      }\n' +
+          '      fileListEl.innerHTML = html;\n' +
+          '      btnClear.style.display = "block";\n' +
+          '\n' +
+          '      var delButtons = document.querySelectorAll(".fdel");\n' +
+          '      for (var j = 0; j < delButtons.length; j++) {\n' +
+          '        delButtons[j].addEventListener("click", function(e) {\n' +
+          '          var idx = parseInt(this.dataset.index);\n' +
+          '          sharedFiles.splice(idx, 1);\n' +
+          '          render();\n' +
+          '        });\n' +
+          '      }\n' +
+          '    }\n' +
+          '\n' +
+          '    function formatSize(bytes) {\n' +
+          '      if (!bytes) return "0 B";\n' +
+          '      var units = ["B", "KB", "MB", "GB"];\n' +
+          '      var i = Math.floor(Math.log(bytes) / Math.log(1024));\n' +
+          '      return (bytes / Math.pow(1024, i)).toFixed(1) + " " + units[i];\n' +
+          '    }\n' +
+          '\n' +
+          '    document.getElementById("btn-file").addEventListener("click", function() {\n' +
+          '      fileInput.click();\n' +
+          '    });\n' +
+          '\n' +
+          '    document.getElementById("btn-folder").addEventListener("click", function() {\n' +
+          '      var isSupported = ("webkitdirectory" in HTMLInputElement.prototype) ||\n' +
+          '                        ("directory" in HTMLInputElement.prototype);\n' +
+          '      if (isSupported) {\n' +
+          '        folderInput.click();\n' +
+          '      } else {\n' +
+          '        alert("Browser ini tidak mendukung pemilihan folder. Silakan gunakan tombol Pilih File.");\n' +
+          '      }\n' +
+          '    });\n' +
+          '\n' +
+          '    fileInput.addEventListener("change", async function() {\n' +
+          '      if (fileInput.files.length > 0) {\n' +
+          '        await addFiles(Array.from(fileInput.files));\n' +
+          '        fileInput.value = "";\n' +
+          '      }\n' +
+          '    });\n' +
+          '\n' +
+          '    folderInput.addEventListener("change", async function() {\n' +
+          '      if (folderInput.files.length > 0) {\n' +
+          '        var firstFile = folderInput.files[0];\n' +
+          '        var folderName = firstFile.webkitRelativePath ? firstFile.webkitRelativePath.split("/")[0] : "Folder";\n' +
+          '        await addFiles(Array.from(folderInput.files));\n' +
+          '        folderInput.value = "";\n' +
+          '        alert("Folder \\"" + folderName + "\\" berhasil ditambahkan.");\n' +
+          '      }\n' +
+          '    });\n' +
+          '\n' +
+          '    btnClear.addEventListener("click", function() {\n' +
+          '      sharedFiles = [];\n' +
+          '      render();\n' +
+          '    });\n' +
+          '\n' +
+          '    peer.on("open", function() {\n' +
+          '      statusBadge.className = "status-badge waiting";\n' +
+          '      statusBadge.innerHTML = "<span class=\\"dot yellow\\"></span> Menunggu laptop...";\n' +
+          '    });\n' +
+          '\n' +
+          '    peer.on("connection", function(conn) {\n' +
+          '      dataConnection = conn;\n' +
+          '      statusBadge.className = "status-badge connected";\n' +
+          '      statusBadge.innerHTML = "<span class=\\"dot green\\"></span> Laptop terhubung!";\n' +
+          '\n' +
+          '      conn.on("data", function(data) {\n' +
+          '        if (data.type === "list-files") {\n' +
+          '          var entries = [];\n' +
+          '          for (var i = 0; i < sharedFiles.length; i++) {\n' +
+          '            entries.push({\n' +
+          '              index: i,\n' +
+          '              name: sharedFiles[i].name,\n' +
+          '              size: sharedFiles[i].size,\n' +
+          '              mime: sharedFiles[i].mime\n' +
+          '            });\n' +
+          '          }\n' +
+          '          conn.send({ type: "file-list", entries: entries });\n' +
+          '        } else if (data.type === "download-file") {\n' +
+          '          var f = sharedFiles[data.index];\n' +
+          '          if (f) {\n' +
+          '            conn.send({ type: "file-meta", name: f.name, size: f.size, mime: f.mime });\n' +
+          '            var bytes = new Uint8Array(f.data);\n' +
+          '            var offset = 0;\n' +
+          '            function sendChunk() {\n' +
+          '              if (offset >= bytes.length) {\n' +
+          '                conn.send({ type: "file-chunk", done: true });\n' +
+          '                return;\n' +
+          '              }\n' +
+          '              conn.send({\n' +
+          '                type: "file-chunk",\n' +
+          '                data: Array.from(bytes.slice(offset, offset + 65536))\n' +
+          '              });\n' +
+          '              offset += 65536;\n' +
+          '              setTimeout(sendChunk, 10);\n' +
+          '            }\n' +
+          '            sendChunk();\n' +
+          '          }\n' +
+          '        }\n' +
+          '      });\n' +
+          '\n' +
+          '      conn.on("close", function() {\n' +
+          '        dataConnection = null;\n' +
+          '        statusBadge.className = "status-badge waiting";\n' +
+          '        statusBadge.innerHTML = "<span class=\\"dot yellow\\"></span> Menunggu laptop...";\n' +
+          '      });\n' +
+          '    });\n' +
+          '  })();\n' +
+          '<\/script>\n' +
+          '</body>\n' +
+          '</html>';
       }
-    } else if (d.type === 'error') {
-      alert('⚠️ ' + d.msg);
-    }
-  }
 
-  function fmtSize(b) {
-    if (!b) return '0 B';
-    const u = ['B','KB','MB','GB'];
-    const i = Math.floor(Math.log(b) / Math.log(1024));
-    return (b / Math.pow(1024, i)).toFixed(1) + ' ' + u[i];
-  }
+      // ========== TEMPLATE CLIENT ==========
+      function getClientHTML(id, images) {
+        const galleryHTML = images.length > 0 ?
+          images.map(img => '<img src="' + img + '" style="max-width:100px;border-radius:12px;margin:5px;">').join('') :
+          '<div style="font-size:48px;">💻</div>';
 
-  function showToast(msg) {
-    const old = document.querySelector('.toast'); if (old) old.remove();
-    const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
-    document.body.appendChild(t);
-    setTimeout(() => t.remove(), 2500);
-  }
-</script>
+        return '<!DOCTYPE html>\n' +
+          '<html lang="id">\n' +
+          '<head>\n' +
+          '  <meta charset="UTF-8">\n' +
+          '  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n' +
+          '  <title>Laptop Client - ' + id + '</title>\n' +
+          '  <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"><\/script>\n' +
+          '  <style>\n' +
+          '    *{margin:0;padding:0;box-sizing:border-box}\n' +
+          '    body{font-family:\'Segoe UI\',system-ui,sans-serif;background:#0f0f1a;color:#e0e0e0;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}\n' +
+          '    .app{max-width:650px;width:100%}\n' +
+          '    .header{text-align:center;margin-bottom:20px}\n' +
+          '    .header h1{font-size:24px;color:#00d4ff;margin:8px 0}\n' +
+          '    .header .sub{font-size:12px;color:#999}\n' +
+          '    .status-badge{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:20px;font-size:14px;font-weight:600;margin:10px auto;width:fit-content}\n' +
+          '    .status-badge.connecting{background:rgba(255,193,7,0.15);color:#ffc107}\n' +
+          '    .status-badge.connected{background:rgba(76,175,80,0.15);color:#4caf50}\n' +
+          '    .status-badge.disconnected{background:rgba(244,67,54,0.15);color:#f44336}\n' +
+          '    .dot{width:8px;height:8px;border-radius:50%;display:inline-block}\n' +
+          '    .dot.green{background:#4caf50;animation:pulse 2s infinite}\n' +
+          '    .dot.yellow{background:#ffc107;animation:pulse 2s infinite}\n' +
+          '    .dot.red{background:#f44336}\n' +
+          '    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}\n' +
+          '    .card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:18px;margin:10px 0}\n' +
+          '    .btn{padding:12px 20px;border-radius:10px;border:none;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;color:white}\n' +
+          '    .btn:active{transform:scale(0.96)}\n' +
+          '    .btn-connect{background:#00d4ff;color:#000}\n' +
+          '    .btn-refresh{background:rgba(255,255,255,0.1)}\n' +
+          '    .btn-row{display:flex;gap:8px;margin:10px 0;justify-content:center}\n' +
+          '    .file-list{list-style:none}\n' +
+          '    .file-item{display:flex;align-items:center;gap:10px;padding:12px;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer;border-radius:6px;transition:0.2s}\n' +
+          '    .file-item:hover{background:rgba(255,255,255,0.04)}\n' +
+          '    .file-item .ficon{font-size:22px}\n' +
+          '    .file-item .fname{flex:1;font-size:14px}\n' +
+          '    .file-item .fsize{color:#999;font-size:11px}\n' +
+          '    .loading{text-align:center;padding:20px;color:#ffc107;display:none}\n' +
+          '    .empty{text-align:center;padding:30px;color:#999}\n' +
+          '    .download-box{background:rgba(76,175,80,0.1);border-radius:10px;padding:14px;margin-top:10px;display:none;text-align:center}\n' +
+          '    .download-box a{color:#4caf50;font-weight:bold}\n' +
+          '    .info-text{text-align:center;font-size:10px;color:#555;margin-top:15px}\n' +
+          '  </style>\n' +
+          '</head>\n' +
+          '<body>\n' +
+          '<div class="app">\n' +
+          '  <div class="header">\n' +
+          '    ' + galleryHTML + '\n' +
+          '    <h1>Akses File HP</h1>\n' +
+          '    <p class="sub">Auto-connect &bull; ID: ' + id + '</p>\n' +
+          '  </div>\n' +
+          '  <div style="text-align:center">\n' +
+          '    <div id="status-badge" class="status-badge disconnected"><span class="dot red"></span> <span id="status-text">Belum terhubung</span></div>\n' +
+          '  </div>\n' +
+          '  <div class="btn-row">\n' +
+          '    <button class="btn btn-connect" id="btn-connect">Hubungkan ke HP</button>\n' +
+          '    <button class="btn btn-refresh" id="btn-refresh">Refresh File</button>\n' +
+          '  </div>\n' +
+          '  <div class="card">\n' +
+          '    <div class="loading" id="loading">Menghubungkan...</div>\n' +
+          '    <ul class="file-list" id="file-list"></ul>\n' +
+          '    <div class="empty" id="empty">Klik "Hubungkan ke HP" untuk mulai</div>\n' +
+          '  </div>\n' +
+          '  <div class="download-box" id="dl-box">\n' +
+          '    <span id="dl-name"></span> (<span id="dl-size"></span>)<br>\n' +
+          '    <a id="dl-link" href="#" download>Klik untuk menyimpan file</a>\n' +
+          '  </div>\n' +
+          '  <p class="info-text">ID tertanam: ' + id + '</p>\n' +
+          '</div>\n' +
+          '<script>\n' +
+          '  (function() {\n' +
+          '    var FIXED_ID = "' + id + '";\n' +
+          '    var peer, conn, chunks = [], meta = null;\n' +
+          '    var statusBadge = document.getElementById("status-badge");\n' +
+          '    var statusText = document.getElementById("status-text");\n' +
+          '    var loading = document.getElementById("loading");\n' +
+          '    var fileListEl = document.getElementById("file-list");\n' +
+          '    var emptyEl = document.getElementById("empty");\n' +
+          '    var dlBox = document.getElementById("dl-box");\n' +
+          '    var dlName = document.getElementById("dl-name");\n' +
+          '    var dlSize = document.getElementById("dl-size");\n' +
+          '    var dlLink = document.getElementById("dl-link");\n' +
+          '\n' +
+          '    function updateStatus(type, text) {\n' +
+          '      statusBadge.className = "status-badge " + type;\n' +
+          '      statusText.textContent = text;\n' +
+          '    }\n' +
+          '\n' +
+          '    function connect() {\n' +
+          '      if (peer) peer.destroy();\n' +
+          '      updateStatus("connecting", "Menghubungkan...");\n' +
+          '      loading.style.display = "block";\n' +
+          '      fileListEl.innerHTML = "";\n' +
+          '      emptyEl.style.display = "none";\n' +
+          '      dlBox.style.display = "none";\n' +
+          '      peer = new Peer();\n' +
+          '      peer.on("open", function() {\n' +
+          '        conn = peer.connect(FIXED_ID, { reliable: true });\n' +
+          '        conn.on("open", function() {\n' +
+          '          updateStatus("connected", "Terhubung ke HP!");\n' +
+          '          loading.style.display = "none";\n' +
+          '          document.getElementById("btn-connect").textContent = "Reconnect";\n' +
+          '          conn.send({ type: "list-files" });\n' +
+          '        });\n' +
+          '        conn.on("data", function(d) {\n' +
+          '          loading.style.display = "none";\n' +
+          '          if (d.type === "file-list") {\n' +
+          '            fileListEl.innerHTML = "";\n' +
+          '            if (!d.entries || !d.entries.length) {\n' +
+          '              fileListEl.innerHTML = "<div class=\\"empty\\">Tidak ada file di HP</div>";\n' +
+          '              return;\n' +
+          '            }\n' +
+          '            d.entries.forEach(function(e) {\n' +
+          '              var li = document.createElement("li");\n' +
+          '              li.className = "file-item";\n' +
+          '              li.innerHTML = "<span class=\\"ficon\\">📎</span><span class=\\"fname\\">" + e.name + "</span><span class=\\"fsize\\">" + fmtSize(e.size) + "</span>";\n' +
+          '              li.onclick = function() {\n' +
+          '                conn.send({ type: "download-file", index: e.index });\n' +
+          '                li.innerHTML += "<span style=\\"color:#ffc107\\"> ⏳</span>";\n' +
+          '              };\n' +
+          '              fileListEl.appendChild(li);\n' +
+          '            });\n' +
+          '          } else if (d.type === "file-meta") {\n' +
+          '            meta = d;\n' +
+          '            chunks = [];\n' +
+          '            updateStatus("connected", "Mengunduh: " + d.name);\n' +
+          '          } else if (d.type === "file-chunk") {\n' +
+          '            if (d.done) {\n' +
+          '              var blob = new Blob(chunks, { type: meta.mime });\n' +
+          '              dlLink.href = URL.createObjectURL(blob);\n' +
+          '              dlLink.download = meta.name;\n' +
+          '              dlName.textContent = meta.name;\n' +
+          '              dlSize.textContent = fmtSize(meta.size);\n' +
+          '              dlBox.style.display = "block";\n' +
+          '              updateStatus("connected", "Selesai: " + meta.name);\n' +
+          '              chunks = [];\n' +
+          '            } else if (d.data) {\n' +
+          '              chunks.push(new Uint8Array(d.data));\n' +
+          '            }\n' +
+          '          } else if (d.type === "error") {\n' +
+          '            alert(d.msg);\n' +
+          '          }\n' +
+          '        });\n' +
+          '        conn.on("close", function() {\n' +
+          '          updateStatus("disconnected", "Terputus");\n' +
+          '          loading.style.display = "none";\n' +
+          '          document.getElementById("btn-connect").textContent = "Hubungkan ke HP";\n' +
+          '          fileListEl.innerHTML = "<div class=\\"empty\\">Koneksi terputus. Klik Hubungkan lagi.</div>";\n' +
+          '        });\n' +
+          '      });\n' +
+          '      peer.on("error", function(err) {\n' +
+          '        updateStatus("disconnected", err.message);\n' +
+          '        loading.style.display = "none";\n' +
+          '      });\n' +
+          '    }\n' +
+          '\n' +
+          '    document.getElementById("btn-connect").addEventListener("click", connect);\n' +
+          '    document.getElementById("btn-refresh").addEventListener("click", function() {\n' +
+          '      if (conn && conn.open) {\n' +
+          '        loading.style.display = "block";\n' +
+          '        conn.send({ type: "list-files" });\n' +
+          '      } else {\n' +
+          '        connect();\n' +
+          '      }\n' +
+          '    });\n' +
+          '\n' +
+          '    function fmtSize(b) {\n' +
+          '      if (!b) return "0 B";\n' +
+          '      var u = ["B", "KB", "MB", "GB"];\n' +
+          '      var i = Math.floor(Math.log(b) / Math.log(1024));\n' +
+          '      return (b / Math.pow(1024, i)).toFixed(1) + " " + u[i];\n' +
+          '    }\n' +
+          '\n' +
+          '    window.addEventListener("load", function() {\n' +
+          '      setTimeout(connect, 1000);\n' +
+          '    });\n' +
+          '  })();\n' +
+          '<\/script>\n' +
+          '</body>\n' +
+          '</html>';
+      }
+
+      // ========== LIHAT DEVICE LOGIC ==========
+      let viewPeer, viewConn, viewChunks = [], viewMeta = null;
+      const btnConnectView = document.getElementById('btn-connect-view');
+      const viewIdInput = document.getElementById('view-id');
+      const clientStatus = document.getElementById('client-status');
+      const clientFileList = document.getElementById('client-file-list');
+      const clientDlBox = document.getElementById('client-dl-box');
+      const clientDlName = document.getElementById('client-dl-name');
+      const clientDlSize = document.getElementById('client-dl-size');
+      const clientDlLink = document.getElementById('client-dl-link');
+
+      btnConnectView.addEventListener('click', function() {
+        const id = viewIdInput.value.trim();
+        if (!id) return alert('Masukkan ID host!');
+        if (viewPeer) viewPeer.destroy();
+        clientStatus.className = 'client-status connecting';
+        clientStatus.textContent = 'Menghubungkan...';
+        clientFileList.innerHTML = '';
+        clientDlBox.style.display = 'none';
+        viewPeer = new Peer();
+        viewPeer.on('open', function() {
+          viewConn = viewPeer.connect(id, { reliable: true });
+          viewConn.on('open', function() {
+            clientStatus.className = 'client-status connected';
+            clientStatus.textContent = 'Terhubung!';
+            viewConn.send({ type: 'list-files' });
+          });
+          viewConn.on('data', function(d) {
+            if (d.type === 'file-list') {
+              clientFileList.innerHTML = '';
+              if (!d.entries || !d.entries.length) {
+                clientFileList.innerHTML = '<div style="padding:20px;text-align:center;color:#999;">Tidak ada file</div>';
+                return;
+              }
+              d.entries.forEach(function(e) {
+                const li = document.createElement('li');
+                li.className = 'file-item';
+                li.innerHTML = '<span class="ficon">📎</span><span class="fname">' + e.name + '</span><span class="fsize">' + fmtSizeView(e.size) + '</span>';
+                li.addEventListener('click', function() {
+                  viewConn.send({ type: 'download-file', index: e.index });
+                });
+                clientFileList.appendChild(li);
+              });
+            } else if (d.type === 'file-meta') {
+              viewMeta = d;
+              viewChunks = [];
+            } else if (d.type === 'file-chunk') {
+              if (d.done) {
+                const blob = new Blob(viewChunks, { type: viewMeta.mime });
+                clientDlLink.href = URL.createObjectURL(blob);
+                clientDlLink.download = viewMeta.name;
+                clientDlName.textContent = viewMeta.name;
+                clientDlSize.textContent = fmtSizeView(viewMeta.size);
+                clientDlBox.style.display = 'block';
+                viewChunks = [];
+              } else if (d.data) {
+                viewChunks.push(new Uint8Array(d.data));
+              }
+            } else if (d.type === 'error') {
+              alert(d.msg);
+            }
+          });
+          viewConn.on('close', function() {
+            clientStatus.className = 'client-status disconnected';
+            clientStatus.textContent = 'Terputus';
+          });
+        });
+        viewPeer.on('error', function(err) {
+          clientStatus.className = 'client-status disconnected';
+          clientStatus.textContent = err.message;
+        });
+      });
+
+      function fmtSizeView(b) {
+        if (!b) return '0 B';
+        const u = ['B', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(b) / Math.log(1024));
+        return (b / Math.pow(1024, i)).toFixed(1) + ' ' + u[i];
+      }
+
+      // ========== TOAST NOTIFICATION ==========
+      function showToast(msg) {
+        const old = document.querySelector('.toast');
+        if (old) old.remove();
+        const t = document.createElement('div');
+        t.className = 'toast';
+        t.textContent = msg;
+        document.body.appendChild(t);
+        setTimeout(function() { t.remove(); }, 2500);
+      }
+    })();
+  </script>
 </body>
 </html>
