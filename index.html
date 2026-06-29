@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pembuat File Remote - Auto Connect</title>
+  <title>Generator Shortcut Remote</title>
   <style>
     :root {
       --bg: #0a0a14;
@@ -25,7 +25,7 @@
       padding: 20px;
     }
     .container {
-      max-width: 520px;
+      max-width: 500px;
       width: 100%;
       background: var(--card);
       backdrop-filter: blur(15px);
@@ -43,15 +43,8 @@
       background-clip: text;
       margin-bottom: 5px;
     }
-    .subtitle {
-      text-align: center;
-      font-size: 12px;
-      color: #888;
-      margin-bottom: 25px;
-    }
-    .form-group {
-      margin-bottom: 18px;
-    }
+    .subtitle { text-align: center; font-size: 12px; color: #888; margin-bottom: 25px; }
+    .form-group { margin-bottom: 18px; }
     label {
       display: block;
       font-size: 13px;
@@ -61,88 +54,32 @@
       text-transform: uppercase;
       letter-spacing: 1px;
     }
-    .radio-group {
-      display: flex;
-      gap: 10px;
-    }
+    .radio-group { display: flex; gap: 10px; }
     .radio-option {
-      flex: 1;
-      padding: 12px;
-      border-radius: 10px;
+      flex: 1; padding: 12px; border-radius: 10px;
       border: 1px solid var(--border);
       background: rgba(255,255,255,0.03);
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-weight: 500;
-      user-select: none;
+      text-align: center; cursor: pointer;
+      transition: all 0.2s; font-weight: 500;
     }
     .radio-option.selected {
       background: rgba(255,94,98,0.2);
       border-color: var(--accent);
       color: var(--accent);
     }
-    .radio-option:hover {
-      background: rgba(255,255,255,0.06);
+    .radio-option:hover { background: rgba(255,255,255,0.06); }
+    input[type="text"] {
+      width: 100%; padding: 12px 15px;
+      border-radius: 10px; border: 1px solid var(--border);
+      background: rgba(0,0,0,0.3); color: white; font-size: 15px;
+      outline: none; transition: border 0.2s;
     }
-    input[type="text"], input[type="file"] {
-      width: 100%;
-      padding: 12px 15px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: rgba(0,0,0,0.3);
-      color: white;
-      font-size: 15px;
-      outline: none;
-      transition: border 0.2s;
-    }
-    input[type="text"]:focus {
-      border-color: var(--accent2);
-    }
-    .file-upload-area {
-      border: 2px dashed var(--border);
-      border-radius: 10px;
-      padding: 20px;
-      text-align: center;
-      cursor: pointer;
-      transition: 0.2s;
-      background: rgba(255,255,255,0.02);
-      margin-top: 5px;
-    }
-    .file-upload-area:hover {
-      border-color: var(--accent2);
-      background: rgba(255,255,255,0.05);
-    }
-    .file-upload-area .icon {
-      font-size: 36px;
-      margin-bottom: 6px;
-    }
-    .file-upload-area .text {
-      font-size: 12px;
-      color: #888;
-    }
-    .file-upload-area img {
-      max-width: 100%;
-      max-height: 150px;
-      border-radius: 8px;
-      margin-top: 8px;
-      display: none;
-    }
-    .btn-row {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
-    }
+    input[type="text"]:focus { border-color: var(--accent2); }
+    .btn-row { display: flex; gap: 10px; margin-top: 10px; }
     button {
-      flex: 1;
-      padding: 14px;
-      border-radius: 10px;
-      border: none;
-      font-weight: 600;
-      font-size: 15px;
-      cursor: pointer;
-      transition: all 0.2s;
-      color: white;
+      flex: 1; padding: 14px; border-radius: 10px;
+      border: none; font-weight: 600; font-size: 15px;
+      cursor: pointer; transition: all 0.2s; color: white;
     }
     button:active { transform: scale(0.96); }
     .btn-generate { background: rgba(255,255,255,0.1); }
@@ -151,76 +88,51 @@
       font-size: 16px;
     }
     .toast {
-      position: fixed;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #333;
-      color: white;
-      padding: 12px 24px;
-      border-radius: 30px;
-      font-size: 13px;
-      font-weight: 600;
-      z-index: 999;
+      position: fixed; bottom: 30px; left: 50%;
+      transform: translateX(-50%); background: #333; color: white;
+      padding: 12px 24px; border-radius: 30px; font-size: 13px;
+      font-weight: 600; z-index: 999;
       animation: toastIn 0.3s ease, toastOut 0.3s ease 2s forwards;
       pointer-events: none;
     }
-    @keyframes toastIn {
-      from { opacity: 0; transform: translateX(-50%) translateY(20px); }
-      to { opacity: 1; transform: translateX(-50%) translateY(0); }
-    }
-    @keyframes toastOut {
-      from { opacity: 1; }
-      to { opacity: 0; transform: translateX(-50%) translateY(-10px); }
-    }
+    @keyframes toastIn { from { opacity:0; transform:translateX(-50%) translateY(20px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
+    @keyframes toastOut { from { opacity:1; } to { opacity:0; transform:translateX(-50%) translateY(-10px); } }
     .preview-box {
-      background: rgba(0,0,0,0.3);
-      border-radius: 10px;
-      padding: 15px;
-      margin-top: 20px;
-      border: 1px solid var(--border);
-      display: none;
-      text-align: center;
+      background: rgba(0,0,0,0.3); border-radius: 10px; padding: 15px;
+      margin-top: 20px; border: 1px solid var(--border); display: none; text-align: center;
     }
     .preview-box .status { color: #4caf50; font-weight: bold; }
     code { color: var(--accent2); word-break: break-all; }
+    .note { font-size: 10px; color: #666; margin-top: 10px; text-align: center; }
   </style>
 </head>
 <body>
 <div class="container">
-  <h1>🔧 Generator Remote</h1>
-  <p class="subtitle">Bikin file "gambar" kustom untuk HP & laptop</p>
+  <h1>🔧 Generator Shortcut</h1>
+  <p class="subtitle">Bikin file "gambar" kecil untuk langsung lihat device di Vercel</p>
 
   <div class="form-group">
-    <label>Pilih Tipe Perangkat</label>
+    <label>Pilih Tipe Shortcut</label>
     <div class="radio-group" id="type-selector">
       <div class="radio-option selected" data-type="host">
-        <span style="font-size:24px;">📱</span><br>HP (Host)
+        <span style="font-size:24px;">📱</span><br>Host (HP)
       </div>
       <div class="radio-option" data-type="client">
-        <span style="font-size:24px;">💻</span><br>Laptop (Client)
+        <span style="font-size:24px;">💻</span><br>Client (Laptop)
       </div>
     </div>
+    <p style="font-size:10px;color:#666;margin-top:4px;">
+      Host: halaman untuk HP (share file). Client: halaman untuk laptop (lihat file HP).
+    </p>
   </div>
 
   <div class="form-group">
-    <label>ID Koneksi (harus sama di kedua perangkat)</label>
-    <input type="text" id="custom-id" placeholder="Masukkan ID unik, misal: keluarga-2024" value="bang-remote-2024">
+    <label>ID Koneksi (harus sama di HP & Laptop)</label>
+    <input type="text" id="custom-id" placeholder="Masukkan ID unik" value="bang-remote-2024">
     <div class="btn-row">
-      <button class="btn-generate" id="btn-random">🎲 Random</button>
+      <button class="btn-generate" id="btn-random">🎲 Acak</button>
       <button class="btn-generate" id="btn-simple">📝 Sederhana</button>
     </div>
-  </div>
-
-  <div class="form-group">
-    <label>Upload Gambar / Logo (opsional)</label>
-    <div class="file-upload-area" id="upload-area">
-      <div class="icon">🖼️</div>
-      <div class="text">Klik untuk pilih gambar (max 1MB)</div>
-      <img id="preview-img" alt="Preview">
-    </div>
-    <input type="file" id="image-input" accept="image/*" style="display:none;">
-    <button class="btn-generate" id="btn-remove-img" style="margin-top:6px; display:none;">❌ Hapus Gambar</button>
   </div>
 
   <button class="btn-download" id="btn-download">⬇️ Download File "Gambar"</button>
@@ -230,27 +142,24 @@
     <span id="preview-name"></span><br>
     <small>ID: <code id="preview-id"></code></small>
   </div>
+  <p class="note">
+    Setelah didownload, ganti ikon file dengan gambar/foto agar terlihat seperti file gambar biasa.
+  </p>
 </div>
 
 <script>
-  // ========== DOM ==========
+  let selectedType = 'host'; // default
+  const BASE_URL = window.location.origin; // otomatis ikuti domain Vercel
+
   const typeOptions = document.querySelectorAll('.radio-option');
   const idInput = document.getElementById('custom-id');
   const btnRandom = document.getElementById('btn-random');
   const btnSimple = document.getElementById('btn-simple');
-  const uploadArea = document.getElementById('upload-area');
-  const imageInput = document.getElementById('image-input');
-  const previewImg = document.getElementById('preview-img');
-  const btnRemoveImg = document.getElementById('btn-remove-img');
   const btnDownload = document.getElementById('btn-download');
   const previewBox = document.getElementById('preview-box');
   const previewName = document.getElementById('preview-name');
   const previewId = document.getElementById('preview-id');
 
-  let selectedType = 'host';
-  let imageBase64 = ''; // data:image/...;base64,...
-
-  // ========== Type Selector ==========
   typeOptions.forEach(opt => {
     opt.addEventListener('click', () => {
       typeOptions.forEach(o => o.classList.remove('selected'));
@@ -259,61 +168,36 @@
     });
   });
 
-  // ========== ID Buttons ==========
   btnRandom.addEventListener('click', () => {
-    const rand = 'rem-' + Math.random().toString(36).substring(2, 10) + '-' + Date.now().toString(36);
-    idInput.value = rand;
+    idInput.value = 'rem-' + Math.random().toString(36).substring(2,10) + '-' + Date.now().toString(36);
   });
   btnSimple.addEventListener('click', () => {
-    const simple = prompt('Masukkan ID sederhana (huruf & angka, tanpa spasi):', 'keluarga-2024');
-    if (simple && simple.trim()) {
-      idInput.value = simple.trim().replace(/\s+/g, '-');
-    }
+    const val = prompt('Masukkan ID sederhana:', 'keluarga-2024');
+    if (val && val.trim()) idInput.value = val.trim().replace(/\s+/g, '-');
   });
 
-  // ========== Image Upload ==========
-  uploadArea.addEventListener('click', () => imageInput.click());
-  imageInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    if (file.size > 1 * 1024 * 1024) {
-      alert('Gambar terlalu besar! Maksimal 1MB.');
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      imageBase64 = ev.target.result;
-      previewImg.src = imageBase64;
-      previewImg.style.display = 'block';
-      btnRemoveImg.style.display = 'block';
-      uploadArea.querySelector('.icon').style.display = 'none';
-      uploadArea.querySelector('.text').textContent = '✅ Gambar dipilih';
-    };
-    reader.readAsDataURL(file);
-    imageInput.value = '';
-  });
-  btnRemoveImg.addEventListener('click', () => {
-    imageBase64 = '';
-    previewImg.src = '';
-    previewImg.style.display = 'none';
-    btnRemoveImg.style.display = 'none';
-    uploadArea.querySelector('.icon').style.display = 'block';
-    uploadArea.querySelector('.text').textContent = 'Klik untuk pilih gambar (max 1MB)';
-  });
-
-  // ========== Generate & Download ==========
   btnDownload.addEventListener('click', () => {
-    let id = idInput.value.trim();
-    if (!id) {
-      id = 'default-' + Date.now();
-      idInput.value = id;
-    }
+    const id = idInput.value.trim() || 'default-' + Date.now();
+    // Tentukan URL tujuan
+    const targetPage = selectedType === 'host' ? 'index.html' : 'client.html';
+    const fullURL = `${BASE_URL}/${targetPage}?id=${encodeURIComponent(id)}`;
 
-    // Gabungkan template
-    const fileContent = selectedType === 'host' ? getHostHTML(id, imageBase64) : getClientHTML(id, imageBase64);
-    const fileName = selectedType === 'host' ? 'HP-Host-Remote.html' : 'Laptop-Client-Remote.html';
+    // Buat file HTML kecil yang isinya redirect
+    const fileContent = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="refresh" content="0; url=${fullURL}">
+  <title>Remote</title>
+</head>
+<body>
+  <p>Membuka halaman remote...</p>
+  <script>window.location.href="${fullURL}";<\/script>
+</body>
+</html>`;
 
-    // Download
+    const fileName = selectedType === 'host' ? 'HP-Host-Shortcut.html' : 'Laptop-Client-Shortcut.html';
+
     const blob = new Blob([fileContent], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -324,314 +208,17 @@
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    // Preview
     previewBox.style.display = 'block';
     previewName.textContent = fileName;
     previewId.textContent = id;
-    showToast('✅ File berhasil didownload!');
+    showToast('✅ File shortcut berhasil didownload!');
   });
 
   function showToast(msg) {
-    const old = document.querySelector('.toast');
-    if (old) old.remove();
-    const t = document.createElement('div');
-    t.className = 'toast';
-    t.textContent = msg;
+    const old = document.querySelector('.toast'); if (old) old.remove();
+    const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
     document.body.appendChild(t);
     setTimeout(() => t.remove(), 2500);
-  }
-
-  // ========== TEMPLATE HOST (HP) ==========
-  function getHostHTML(id, imgBase64) {
-    const logoHTML = imgBase64 ? `<img src="${imgBase64}" alt="Logo" style="max-width:120px; border-radius:12px; margin-bottom:8px;">` : '<div class="icon-big">📱</div>';
-    return `<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>HP Remote - ${id}</title>
-  <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"><\/script>
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0a14;color:#e0e0e0;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:16px}
-    .app{max-width:440px;width:100%;text-align:center}
-    .icon-big{font-size:60px;margin-bottom:12px}
-    h1{font-size:24px;font-weight:700;background:linear-gradient(135deg,#ff5e62,#ff9966);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px}
-    .subtitle{font-size:12px;color:#999;margin-bottom:20px}
-    .card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:18px;margin:12px 0;text-align:left}
-    .card-title{font-size:12px;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
-    .status-badge{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:600;margin:8px 0}
-    .status-badge.waiting{background:rgba(255,193,7,0.15);color:#ffc107}
-    .status-badge.connected{background:rgba(76,175,80,0.15);color:#4caf50}
-    .status-badge.error{background:rgba(244,67,54,0.15);color:#f44336}
-    .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
-    .dot.green{background:#4caf50;animation:pulse 2s infinite}
-    .dot.yellow{background:#ffc107;animation:pulse 2s infinite}
-    .dot.red{background:#f44336}
-    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-    .btn{width:100%;padding:14px;border-radius:12px;border:none;font-size:15px;font-weight:600;cursor:pointer;margin:6px 0;display:flex;align-items:center;justify-content:center;gap:8px;color:white;transition:all 0.2s}
-    .btn:active{transform:scale(0.96);opacity:0.9}
-    .btn-primary{background:linear-gradient(135deg,#ff5e62,#ff9966)}
-    .btn-secondary{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15)}
-    .btn-danger{background:rgba(244,67,54,0.3);font-size:13px}
-    .btn-row{display:flex;gap:8px}
-    .btn-row .btn{flex:1}
-    .file-list{max-height:250px;overflow-y:auto;margin:8px 0;border-radius:10px;text-align:left}
-    .file-item{display:flex;align-items:center;gap:10px;padding:10px;background:rgba(255,255,255,0.03);border-radius:10px;margin:4px 0}
-    .file-item .ficon{font-size:24px;width:30px;text-align:center}
-    .file-item .finfo{flex:1}
-    .file-item .fname{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .file-item .fmeta{font-size:10px;color:#999}
-    .file-item .fdel{width:28px;height:28px;border-radius:50%;background:rgba(244,67,54,0.2);border:none;color:#f44336;font-size:14px;cursor:pointer}
-    .empty-state{text-align:center;padding:25px;color:#999}
-    .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#333;color:white;padding:12px 24px;border-radius:30px;font-size:13px;font-weight:600;z-index:999;animation:toastIn 0.3s ease,toastOut 0.3s ease 2s forwards;pointer-events:none}
-    @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
-    @keyframes toastOut{from{opacity:1}to{opacity:0;transform:translateX(-50%) translateY(-10px)}}
-  </style>
-</head>
-<body>
-<div class="app">
-  ${logoHTML}
-  <h1>HP Remote</h1>
-  <p class="subtitle">Auto-connect &bull; ID: ${id}</p>
-  <div id="status-badge" class="status-badge waiting"><span class="dot yellow"></span> Menunggu laptop...</div>
-  <div class="card">
-    <div class="card-title">📎 File Dibagikan</div>
-    <div class="btn-row">
-      <button class="btn btn-secondary" id="btn-file">📄 Pilih File</button>
-      <button class="btn btn-secondary" id="btn-folder">📁 Folder</button>
-    </div>
-    <div class="file-list" id="file-list"><div class="empty-state">📭 Belum ada file</div></div>
-    <button class="btn btn-danger" id="btn-clear" style="display:none">🗑️ Hapus Semua</button>
-  </div>
-  <p style="font-size:10px;color:#555">Jangan tutup halaman ini</p>
-</div>
-<input type="file" id="file-input" multiple style="display:none" accept="*/*">
-<input type="file" id="folder-input" webkitdirectory style="display:none">
-<script>
-  const FIXED_ID = '${id}';
-  const peer = new Peer(FIXED_ID);
-  let dataConnection = null;
-  let sharedFiles = [];
-  const statusBadge = document.getElementById('status-badge');
-  const fileListEl = document.getElementById('file-list');
-  const fileInput = document.getElementById('file-input');
-  const folderInput = document.getElementById('folder-input');
-  const btnClear = document.getElementById('btn-clear');
-  peer.on('open', (id) => {
-    statusBadge.className = 'status-badge waiting';
-    statusBadge.innerHTML = '<span class="dot yellow"></span> Menunggu laptop...';
-  });
-  peer.on('connection', (conn) => {
-    dataConnection = conn;
-    statusBadge.className = 'status-badge connected';
-    statusBadge.innerHTML = '<span class="dot green"></span> Laptop terhubung!';
-    conn.on('data', (data) => {
-      if (data.type === 'list-files') {
-        conn.send({ type: 'file-list', entries: sharedFiles.map((f,i) => ({index:i, name:f.name, size:f.size, mime:f.mime})) });
-      } else if (data.type === 'download-file') {
-        const f = sharedFiles[data.index];
-        if (f) {
-          conn.send({ type: 'file-meta', name: f.name, size: f.size, mime: f.mime });
-          const bytes = new Uint8Array(f.data);
-          let offset = 0;
-          function send() {
-            if (offset >= bytes.length) { conn.send({ type: 'file-chunk', done: true }); return; }
-            conn.send({ type: 'file-chunk', data: Array.from(bytes.slice(offset, offset+65536)) });
-            offset += 65536;
-            setTimeout(send, 10);
-          }
-          send();
-        }
-      }
-    });
-    conn.on('close', () => {
-      dataConnection = null;
-      statusBadge.className = 'status-badge waiting';
-      statusBadge.innerHTML = '<span class="dot yellow"></span> Menunggu laptop...';
-    });
-  });
-  document.getElementById('btn-file').onclick = () => fileInput.click();
-  document.getElementById('btn-folder').onclick = () => folderInput.click();
-  fileInput.onchange = async () => { await addFiles(Array.from(fileInput.files)); fileInput.value = ''; };
-  folderInput.onchange = async () => { await addFiles(Array.from(folderInput.files)); folderInput.value = ''; };
-  btnClear.onclick = () => { sharedFiles = []; render(); };
-  async function addFiles(files) {
-    for (const file of files) {
-      if (sharedFiles.find(f=>f.name===file.name&&f.size===file.size)) continue;
-      if (file.size > 200*1024*1024) { alert('File terlalu besar: '+file.name); continue; }
-      sharedFiles.push({ name: file.name, size: file.size, mime: file.type||'application/octet-stream', data: await file.arrayBuffer() });
-    }
-    render();
-  }
-  function deleteFile(i) { sharedFiles.splice(i,1); render(); }
-  function render() {
-    if (sharedFiles.length === 0) {
-      fileListEl.innerHTML = '<div class="empty-state">📭 Belum ada file</div>';
-      btnClear.style.display = 'none';
-      return;
-    }
-    fileListEl.innerHTML = sharedFiles.map((f,i) => '<div class="file-item"><span class="ficon">📎</span><div class="finfo"><div class="fname">'+f.name+'</div><div class="fmeta">'+formatSize(f.size)+'</div></div><button class="fdel" onclick="deleteFile('+i+')">✕</button></div>').join('');
-    btnClear.style.display = 'block';
-  }
-  function formatSize(b) { const u=['B','KB','MB','GB']; const i=Math.floor(Math.log(b)/Math.log(1024)); return (b/Math.pow(1024,i)).toFixed(1)+' '+u[i]; }
-<\/script>
-</body>
-</html>`;
-  }
-
-  // ========== TEMPLATE CLIENT (LAPTOP) ==========
-  function getClientHTML(id, imgBase64) {
-    const logoHTML = imgBase64 ? `<img src="${imgBase64}" alt="Logo" style="max-width:120px; border-radius:12px; margin-bottom:8px;">` : '<div class="icon" style="font-size:48px;">💻</div>';
-    return `<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Laptop Client - ${id}</title>
-  <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"><\/script>
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:'Segoe UI',system-ui,sans-serif;background:#0f0f1a;color:#e0e0e0;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
-    .app{max-width:650px;width:100%}
-    .header{text-align:center;margin-bottom:20px}
-    .header h1{font-size:24px;color:#00d4ff;margin:8px 0}
-    .header .sub{font-size:12px;color:#999}
-    .status-badge{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:20px;font-size:14px;font-weight:600;margin:10px auto;width:fit-content}
-    .status-badge.connecting{background:rgba(255,193,7,0.15);color:#ffc107}
-    .status-badge.connected{background:rgba(76,175,80,0.15);color:#4caf50}
-    .status-badge.disconnected{background:rgba(244,67,54,0.15);color:#f44336}
-    .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
-    .dot.green{background:#4caf50;animation:pulse 2s infinite}
-    .dot.yellow{background:#ffc107;animation:pulse 2s infinite}
-    .dot.red{background:#f44336}
-    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-    .card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:18px;margin:10px 0}
-    .btn{padding:12px 20px;border-radius:10px;border:none;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;color:white}
-    .btn:active{transform:scale(0.96)}
-    .btn-connect{background:#00d4ff;color:#000}
-    .btn-refresh{background:rgba(255,255,255,0.1)}
-    .btn-row{display:flex;gap:8px;margin:10px 0;justify-content:center}
-    .file-list{list-style:none}
-    .file-item{display:flex;align-items:center;gap:10px;padding:12px;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer;border-radius:6px;transition:0.2s}
-    .file-item:hover{background:rgba(255,255,255,0.04)}
-    .file-item .ficon{font-size:22px}
-    .file-item .fname{flex:1;font-size:14px}
-    .file-item .fsize{color:#999;font-size:11px}
-    .loading{text-align:center;padding:20px;color:#ffc107;display:none}
-    .empty{text-align:center;padding:30px;color:#999}
-    .download-box{background:rgba(76,175,80,0.1);border-radius:10px;padding:14px;margin-top:10px;display:none;text-align:center}
-    .download-box a{color:#4caf50;font-weight:bold}
-    .info-text{text-align:center;font-size:10px;color:#555;margin-top:15px}
-  </style>
-</head>
-<body>
-<div class="app">
-  <div class="header">
-    ${logoHTML}
-    <h1>Akses File HP</h1>
-    <p class="sub">Auto-connect &bull; ID: ${id}</p>
-  </div>
-  <div style="text-align:center">
-    <div id="status-badge" class="status-badge disconnected"><span class="dot red"></span> <span id="status-text">🔴 Belum terhubung</span></div>
-  </div>
-  <div class="btn-row">
-    <button class="btn btn-connect" id="btn-connect">🔗 Hubungkan ke HP</button>
-    <button class="btn btn-refresh" id="btn-refresh">🔄 Refresh File</button>
-  </div>
-  <div class="card">
-    <div class="loading" id="loading">⏳ Menghubungkan...</div>
-    <ul class="file-list" id="file-list"></ul>
-    <div class="empty" id="empty">👆 Klik "Hubungkan ke HP" untuk mulai</div>
-  </div>
-  <div class="download-box" id="dl-box">
-    ✅ <span id="dl-name"></span> (<span id="dl-size"></span>)<br>
-    <a id="dl-link" href="#" download>💾 Klik untuk menyimpan file</a>
-  </div>
-  <p class="info-text">ID tertanam: ${id}</p>
-</div>
-<script>
-  const FIXED_ID = '${id}';
-  let peer, conn, _chunks = [], _meta = null;
-  const statusBadge = document.getElementById('status-badge');
-  const statusText = document.getElementById('status-text');
-  const loading = document.getElementById('loading');
-  const fileListEl = document.getElementById('file-list');
-  const emptyEl = document.getElementById('empty');
-  const dlBox = document.getElementById('dl-box');
-  const dlName = document.getElementById('dl-name');
-  const dlSize = document.getElementById('dl-size');
-  const dlLink = document.getElementById('dl-link');
-  function updateStatus(type, text) {
-    statusBadge.className = 'status-badge ' + type;
-    statusText.textContent = text;
-  }
-  function connect() {
-    if (peer) peer.destroy();
-    updateStatus('connecting', '🟡 Menghubungkan...');
-    loading.style.display = 'block';
-    fileListEl.innerHTML = '';
-    emptyEl.style.display = 'none';
-    dlBox.style.display = 'none';
-    peer = new Peer();
-    peer.on('open', () => {
-      conn = peer.connect(FIXED_ID, { reliable: true });
-      conn.on('open', () => {
-        updateStatus('connected', '🟢 Terhubung ke HP!');
-        loading.style.display = 'none';
-        document.getElementById('btn-connect').textContent = '🔄 Reconnect';
-        conn.send({ type: 'list-files' });
-      });
-      conn.on('data', (d) => {
-        loading.style.display = 'none';
-        if (d.type === 'file-list') {
-          fileListEl.innerHTML = '';
-          if (!d.entries?.length) { fileListEl.innerHTML = '<div class="empty">📭 Tidak ada file di HP</div>'; return; }
-          d.entries.forEach(e => {
-            const li = document.createElement('li');
-            li.className = 'file-item';
-            li.innerHTML = '<span class="ficon">📎</span><span class="fname">'+e.name+'</span><span class="fsize">'+fmtSize(e.size)+'</span>';
-            li.onclick = () => { conn.send({ type: 'download-file', index: e.index }); li.innerHTML += '<span style="color:#ffc107"> ⏳</span>'; };
-            fileListEl.appendChild(li);
-          });
-        } else if (d.type === 'file-meta') {
-          _meta = d; _chunks = [];
-          updateStatus('connected', '📥 Downloading: '+d.name);
-        } else if (d.type === 'file-chunk') {
-          if (d.done) {
-            const blob = new Blob(_chunks, { type: _meta.mime });
-            dlLink.href = URL.createObjectURL(blob);
-            dlLink.download = _meta.name;
-            dlName.textContent = _meta.name;
-            dlSize.textContent = fmtSize(_meta.size);
-            dlBox.style.display = 'block';
-            updateStatus('connected', '✅ Selesai: '+_meta.name);
-            _chunks = [];
-          } else if (d.data) { _chunks.push(new Uint8Array(d.data)); }
-        } else if (d.type === 'error') { alert('⚠️ '+d.msg); }
-      });
-      conn.on('close', () => {
-        updateStatus('disconnected', '🔴 Terputus');
-        loading.style.display = 'none';
-        document.getElementById('btn-connect').textContent = '🔗 Hubungkan ke HP';
-        fileListEl.innerHTML = '<div class="empty">🔴 Koneksi terputus. Klik Hubungkan lagi.</div>';
-      });
-    });
-    peer.on('error', (err) => {
-      updateStatus('disconnected', '❌ '+err.message);
-      loading.style.display = 'none';
-    });
-  }
-  document.getElementById('btn-connect').onclick = connect;
-  document.getElementById('btn-refresh').onclick = () => {
-    if (conn && conn.open) { loading.style.display = 'block'; conn.send({ type: 'list-files' }); }
-    else connect();
-  };
-  function fmtSize(b) { const u=['B','KB','MB','GB']; const i=Math.floor(Math.log(b)/Math.log(1024)); return (b/Math.pow(1024,i)).toFixed(1)+' '+u[i]; }
-  window.addEventListener('load', () => setTimeout(connect, 1000));
-<\/script>
-</body>
-</html>`;
   }
 </script>
 </body>
