@@ -2,117 +2,786 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Remote HP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>HP Host - Remote File</title>
   <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
   <style>
-    body { font-family: sans-serif; padding: 10px; }
-    video { width: 100%; border: 1px solid #ccc; }
-    input, button { padding: 8px; margin: 5px 0; }
-    #file-list { list-style: none; padding: 0; }
-    #file-list li { padding: 5px; border-bottom: 1px solid #eee; cursor: pointer; }
-    .folder { font-weight: bold; }
-    .file { color: blue; }
+    :root {
+      --bg: #0a0a14;
+      --card: rgba(255,255,255,0.03);
+      --accent: #ff5e62;
+      --accent2: #00d4ff;
+      --text: #e0e0e0;
+      --text2: #999;
+      --border: rgba(255,255,255,0.08);
+      --radius: 16px;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+    }
+    
+    .app {
+      max-width: 440px;
+      width: 100%;
+    }
+    
+    /* Header */
+    .header {
+      text-align: center;
+      padding: 20px 0 10px;
+    }
+    .header .icon {
+      font-size: 48px;
+      margin-bottom: 8px;
+    }
+    .header h1 {
+      font-size: 26px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), #ff9966);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .header .subtitle {
+      font-size: 12px;
+      color: var(--text2);
+      margin-top: 4px;
+    }
+    
+    /* Card */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      margin: 12px 0;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    
+    .card-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text2);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+    
+    /* ID Box */
+    .id-box {
+      background: rgba(255,94,98,0.1);
+      border: 2px dashed var(--accent);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      position: relative;
+    }
+    .id-box .label {
+      font-size: 11px;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+    }
+    .id-box .value {
+      font-size: 24px;
+      font-weight: 800;
+      word-break: break-all;
+      letter-spacing: 1px;
+      color: #fff;
+    }
+    .id-box .pulse {
+      position: absolute;
+      top: 8px; right: 12px;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #4caf50;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.5); }
+    }
+    
+    /* Buttons */
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 6px 0;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn:active {
+      transform: scale(0.96);
+      opacity: 0.9;
+    }
+    .btn-primary { background: linear-gradient(135deg, #ff5e62, #ff9966); }
+    .btn-secondary { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); }
+    .btn-danger { background: rgba(244,67,54,0.3); font-size: 13px; }
+    
+    .btn-row {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-row .btn { flex: 1; }
+    
+    /* File List */
+    .file-list {
+      max-height: 280px;
+      overflow-y: auto;
+      margin: 8px 0;
+      border-radius: 10px;
+    }
+    .file-list::-webkit-scrollbar {
+      width: 4px;
+    }
+    .file-list::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.15);
+      border-radius: 4px;
+    }
+    
+    .file-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 10px;
+      margin: 4px 0;
+      transition: 0.2s;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .file-item:hover { background: rgba(255,255,255,0.06); }
+    .file-item .ficon {
+      font-size: 28px;
+      width: 36px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .file-item .finfo {
+      flex: 1;
+      min-width: 0;
+    }
+    .file-item .fname {
+      font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .file-item .fmeta {
+      font-size: 11px;
+      color: var(--text2);
+      margin-top: 2px;
+    }
+    .file-item .fdel {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: rgba(244,67,54,0.2);
+      border: none;
+      color: #f44336;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: 0.2s;
+    }
+    .file-item .fdel:active { background: rgba(244,67,54,0.5); }
+    
+    .empty-state {
+      text-align: center;
+      padding: 30px 20px;
+      color: var(--text2);
+    }
+    .empty-state .big-icon {
+      font-size: 50px;
+      margin-bottom: 10px;
+      opacity: 0.5;
+    }
+    .empty-state p {
+      font-size: 13px;
+    }
+    
+    /* Status */
+    .status-bar {
+      text-align: center;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      margin: 8px 0;
+      transition: all 0.3s;
+    }
+    .status-waiting { background: rgba(255,193,7,0.12); color: #ffc107; }
+    .status-connected { background: rgba(76,175,80,0.12); color: #4caf50; }
+    .status-error { background: rgba(244,67,54,0.12); color: #f44336; }
+    
+    /* Badge */
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    .badge-success { background: rgba(76,175,80,0.2); color: #4caf50; }
+    .badge-warning { background: rgba(255,193,7,0.2); color: #ffc107; }
+    
+    /* Footer */
+    .footer {
+      text-align: center;
+      font-size: 10px;
+      color: #444;
+      padding: 20px 0;
+    }
+    
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 600;
+      z-index: 999;
+      animation: toastIn 0.3s ease, toastOut 0.3s ease 2s forwards;
+      pointer-events: none;
+    }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+    @keyframes toastOut {
+      from { opacity: 1; }
+      to { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+    }
+    
+    /* Preview Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.2s ease;
+    }
+    .modal-overlay img {
+      max-width: 90%;
+      max-height: 80%;
+      border-radius: 8px;
+    }
+    .modal-close {
+      position: absolute;
+      top: 20px; right: 20px;
+      color: white;
+      font-size: 28px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-  <h2>Hubungkan ke Laptop</h2>
-  <input type="text" id="remote-id" placeholder="Masukkan ID laptop">
-  <button id="connect">Hubungkan</button>
-  <button id="disconnect" disabled>Putuskan</button>
-  <p id="status"></p>
-  <video id="remote-screen" autoplay playsinline></video>
 
-  <h3>File Browser</h3>
-  <input type="text" id="folder-path" placeholder="Path (kosong = root)" value="">
-  <button id="list-btn">Lihat Isi Folder</button>
-  <ul id="file-list"></ul>
-  <a id="download-link" style="display:none">Unduh File</a>
+  <div class="app">
+    
+    <!-- Header -->
+    <div class="header">
+      <div class="icon">📱</div>
+      <h1>HP Remote</h1>
+      <p class="subtitle">Bagikan file HP ke laptop dengan mudah</p>
+    </div>
+
+    <!-- ID Card -->
+    <div class="card">
+      <div class="card-title">🔑 ID Koneksi</div>
+      <div class="id-box">
+        <div class="pulse" id="pulse-dot"></div>
+        <div class="label">ID HP Kamu</div>
+        <div class="value" id="id-display">Menghubungkan...</div>
+      </div>
+      <button class="btn btn-primary" id="btn-copy" style="margin-top:10px;">
+        📋 Salin ID ke Clipboard
+      </button>
+      <p style="text-align:center;font-size:10px;color:#666;margin-top:6px;">
+        Masukkan ID ini di laptop untuk terhubung
+      </p>
+    </div>
+
+    <!-- Pilih File -->
+    <div class="card">
+      <div class="card-title">📎 Pilih File untuk Dibagikan</div>
+      
+      <div class="btn-row">
+        <button class="btn btn-secondary" id="btn-file">
+          📄 Pilih File
+        </button>
+        <button class="btn btn-secondary" id="btn-folder">
+          📁 Pilih Folder
+        </button>
+      </div>
+      
+      <!-- File List -->
+      <div class="file-list" id="file-list">
+        <div class="empty-state">
+          <div class="big-icon">📭</div>
+          <p>Belum ada file dipilih</p>
+          <p style="font-size:10px;">Klik tombol di atas untuk memilih</p>
+        </div>
+      </div>
+      
+      <div id="file-stats" style="display:none; text-align:center; margin-top:8px;">
+        <span class="badge badge-warning" id="total-files">0 file</span>
+        <span class="badge badge-warning" id="total-size" style="margin-left:4px;">0 B</span>
+      </div>
+      
+      <button class="btn btn-danger" id="btn-clear" style="display:none;">
+        🗑️ Hapus Semua File
+      </button>
+    </div>
+
+    <!-- Status -->
+    <div class="status-bar status-waiting" id="status">
+      ⏳ Menunggu laptop terhubung...
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      Jangan tutup halaman ini • ID berubah setiap reload
+    </div>
+
+  </div>
+
+  <!-- Hidden file inputs -->
+  <input type="file" id="file-input" multiple style="display:none;" accept="*/*">
+  <input type="file" id="folder-input" webkitdirectory style="display:none;">
 
   <script>
-    let peer, call, dataConn;
-    const remoteScreen = document.getElementById('remote-screen');
-    const status = document.getElementById('status');
+    // ============ PEER JS ============
+    const peer = new Peer();
+    let dataConnection = null;
+    let sharedFiles = []; // { name, size, mime, data: ArrayBuffer }
+    let previewUrl = null;
 
-    document.getElementById('connect').onclick = () => {
-      const remoteId = document.getElementById('remote-id').value.trim();
-      if (!remoteId) return alert('Masukkan ID laptop');
-      peer = new Peer();
-      peer.on('open', id => {
-        call = peer.call(remoteId, new MediaStream()); // dummy stream
-        call.on('stream', stream => {
-          remoteScreen.srcObject = stream;
-          remoteScreen.play();
-          status.textContent = 'Tersambung ke laptop.';
-          document.getElementById('disconnect').disabled = false;
-        });
-        dataConn = peer.connect(remoteId, { reliable: true });
-        dataConn.on('open', () => {
-          status.textContent += ' Data channel siap.';
-        });
-        dataConn.on('data', handleServerData);
-        call.on('close', () => status.textContent = 'Koneksi terputus.');
+    // DOM Elements
+    const $ = (id) => document.getElementById(id);
+    const idDisplay = $('id-display');
+    const statusEl = $('status');
+    const fileListEl = $('file-list');
+    const fileInput = $('file-input');
+    const folderInput = $('folder-input');
+    const btnClear = $('btn-clear');
+    const fileStats = $('file-stats');
+    const totalFiles = $('total-files');
+    const totalSize = $('total-size');
+    const pulseDot = $('pulse-dot');
+
+    // ============ PEER EVENTS ============
+    peer.on('open', (id) => {
+      idDisplay.textContent = id;
+      statusEl.textContent = '✅ Siap! Masukkan ID di laptop';
+      statusEl.className = 'status-bar status-waiting';
+      pulseDot.style.display = 'block';
+      showToast('🟢 ID siap digunakan');
+    });
+
+    peer.on('error', (err) => {
+      statusEl.textContent = '❌ Error: ' + err.message;
+      statusEl.className = 'status-bar status-error';
+      pulseDot.style.display = 'none';
+    });
+
+    peer.on('disconnected', () => {
+      statusEl.textContent = '⚠️ Terputus dari server, mencoba lagi...';
+      statusEl.className = 'status-bar status-waiting';
+      peer.reconnect();
+    });
+
+    // Terima koneksi dari laptop
+    peer.on('connection', (conn) => {
+      dataConnection = conn;
+      statusEl.innerHTML = '💻 <b>Laptop terhubung!</b> — bisa akses file';
+      statusEl.className = 'status-bar status-connected';
+      pulseDot.style.background = '#00d4ff';
+      showToast('💻 Laptop terhubung!');
+
+      conn.on('data', (data) => handleCommand(data, conn));
+
+      conn.on('close', () => {
+        dataConnection = null;
+        statusEl.textContent = '⏳ Laptop terputus, menunggu...';
+        statusEl.className = 'status-bar status-waiting';
+        pulseDot.style.background = '#4caf50';
       });
+
+      conn.on('error', (err) => {
+        console.error('Connection error:', err);
+      });
+    });
+
+    // ============ BUTTON EVENTS ============
+    
+    // Salin ID
+    $('btn-copy').onclick = async () => {
+      const id = idDisplay.textContent;
+      if (!id || id === 'Menghubungkan...') {
+        showToast('⏳ Tunggu ID muncul dulu...');
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(id);
+        showToast('✅ ID berhasil disalin!');
+      } catch {
+        // Fallback
+        prompt('📋 Salin manual ID ini:', id);
+        showToast('📋 Silakan salin manual');
+      }
     };
 
-    document.getElementById('disconnect').onclick = () => {
-      if (call) call.close();
-      if (dataConn) dataConn.close();
-      if (peer) peer.destroy();
-      remoteScreen.srcObject = null;
+    // Pilih File
+    $('btn-file').onclick = () => fileInput.click();
+
+    // Pilih Folder
+    $('btn-folder').onclick = () => {
+      if ('showDirectoryPicker' in window) {
+        // Browser support (Chrome desktop)
+        pickFolderModern();
+      } else {
+        // Fallback pakai webkitdirectory
+        folderInput.click();
+      }
     };
 
-    document.getElementById('list-btn').onclick = () => {
-      if (!dataConn) return alert('Belum terhubung.');
-      const path = document.getElementById('folder-path').value.trim();
-      dataConn.send({ type: 'list-files', path });
+    // File input change
+    fileInput.onchange = async () => {
+      const files = Array.from(fileInput.files);
+      await addFiles(files);
+      fileInput.value = '';
     };
 
-    function handleServerData(data) {
-      if (data.type === 'file-list') {
-        renderFileList(data.entries);
-      } else if (data.type === 'file-meta') {
-        window._downloadMeta = data;
-        window._chunks = [];
-        status.textContent = `Mengunduh ${data.name}...`;
-      } else if (data.type === 'file-chunk') {
-        if (data.done) {
-          const blob = new Blob(window._chunks, { type: window._downloadMeta.mime });
-          const url = URL.createObjectURL(blob);
-          const a = document.getElementById('download-link');
-          a.href = url;
-          a.download = window._downloadMeta.name;
-          a.textContent = `Klik untuk menyimpan ${window._downloadMeta.name}`;
-          a.style.display = 'block';
-          status.textContent = 'Unduhan selesai.';
-          window._chunks = [];
-        } else {
-          window._chunks.push(new Uint8Array(data.data));
+    // Folder input change (fallback)
+    folderInput.onchange = async () => {
+      const files = Array.from(folderInput.files);
+      await addFiles(files);
+      folderInput.value = '';
+    };
+
+    // Clear all
+    $('btn-clear').onclick = () => {
+      if (sharedFiles.length === 0) return;
+      if (confirm('Yakin hapus semua file dari daftar?')) {
+        sharedFiles = [];
+        if (previewUrl) {
+          URL.revokeObjectURL(previewUrl);
+          previewUrl = null;
         }
-      } else if (data.type === 'error') {
-        alert(data.msg);
+        renderFileList();
+        showToast('🗑️ Semua file dihapus');
+      }
+    };
+
+    // ============ FUNCTIONS ============
+
+    async function pickFolderModern() {
+      try {
+        const dirHandle = await window.showDirectoryPicker();
+        const files = await readDirectoryHandle(dirHandle);
+        await addFiles(files);
+        showToast(`📁 Folder "${dirHandle.name}" ditambahkan`);
+      } catch (e) {
+        if (e.name !== 'AbortError') {
+          console.error(e);
+        }
       }
     }
 
-    function renderFileList(entries) {
-      const list = document.getElementById('file-list');
-      list.innerHTML = '';
-      entries.forEach(entry => {
-        const li = document.createElement('li');
-        li.textContent = entry.name;
-        li.className = entry.kind === 'directory' ? 'folder' : 'file';
-        li.onclick = () => {
-          if (entry.kind === 'directory') {
-            document.getElementById('folder-path').value = entry.path;
-            document.getElementById('list-btn').click();
-          } else {
-            if (!dataConn) return;
-            dataConn.send({ type: 'download-file', path: entry.path });
+    async function readDirectoryHandle(dirHandle, path = '') {
+      const files = [];
+      for await (const [name, handle] of dirHandle.entries()) {
+        const entryPath = path ? `${path}/${name}` : name;
+        if (handle.kind === 'file') {
+          const file = await handle.getFile();
+          files.push(new File([file], entryPath, { type: file.type }));
+        } else if (handle.kind === 'directory') {
+          const subDir = await dirHandle.getDirectoryHandle(name);
+          const subFiles = await readDirectoryHandle(subDir, entryPath);
+          files.push(...subFiles);
+        }
+      }
+      return files;
+    }
+
+    async function addFiles(files) {
+      if (!files || files.length === 0) return;
+      
+      showToast(`📥 Memproses ${files.length} file...`);
+      
+      for (const file of files) {
+        // Cek duplikat
+        const exists = sharedFiles.find(f => f.name === file.name && f.size === file.size);
+        if (exists) continue;
+        
+        // Batas ukuran per file: 200MB
+        if (file.size > 200 * 1024 * 1024) {
+          showToast(`⚠️ ${file.name} terlalu besar (>200MB), dilewati`);
+          continue;
+        }
+        
+        try {
+          const buffer = await file.arrayBuffer();
+          sharedFiles.push({
+            name: file.name,
+            size: file.size,
+            mime: file.type || 'application/octet-stream',
+            data: buffer,
+            lastModified: file.lastModified
+          });
+        } catch (e) {
+          console.error('Gagal baca file:', file.name, e);
+        }
+      }
+      
+      renderFileList();
+      showToast(`✅ ${files.length} file berhasil ditambahkan`);
+    }
+
+    function deleteFile(index) {
+      const fileName = sharedFiles[index].name;
+      sharedFiles.splice(index, 1);
+      renderFileList();
+      showToast(`🗑️ ${fileName} dihapus`);
+    }
+
+    function previewFile(index) {
+      const file = sharedFiles[index];
+      if (!file) return;
+      
+      // Cek apakah tipe gambar
+      const imageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/bmp', 'image/svg+xml'];
+      if (imageTypes.includes(file.mime)) {
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+        const blob = new Blob([file.data], { type: file.mime });
+        previewUrl = URL.createObjectURL(blob);
+        
+        // Tampilkan modal
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+          <span class="modal-close">&times;</span>
+          <img src="${previewUrl}" alt="${file.name}">
+        `;
+        modal.onclick = (e) => {
+          if (e.target === modal || e.target.className === 'modal-close') {
+            modal.remove();
           }
         };
-        list.appendChild(li);
+        document.body.appendChild(modal);
+      } else {
+        showToast('📄 Preview hanya untuk gambar');
+      }
+    }
+
+    function getFileIcon(file) {
+      const ext = (file.name.split('.').pop() || '').toLowerCase();
+      const mime = file.mime;
+      
+      // By mime type
+      if (mime.startsWith('image/')) return '🖼️';
+      if (mime.startsWith('video/')) return '🎬';
+      if (mime.startsWith('audio/')) return '🎵';
+      if (mime.includes('pdf')) return '📕';
+      if (mime.includes('zip') || mime.includes('rar') || mime.includes('7z')) return '🗜️';
+      if (mime.includes('apk') || mime.includes('android')) return '📦';
+      
+      // By extension
+      const iconMap = {
+        jpg: '🖼️', jpeg: '🖼️', png: '🖼️', gif: '🖼️', webp: '🖼️', bmp: '🖼️', svg: '🖼️', ico: '🖼️',
+        mp4: '🎬', mkv: '🎬', avi: '🎬', mov: '🎬', webm: '🎬', '3gp': '🎬',
+        mp3: '🎵', wav: '🎵', flac: '🎵', aac: '🎵', ogg: '🎵', m4a: '🎵', opus: '🎵',
+        pdf: '📕', epub: '📗', mobi: '📘',
+        doc: '📄', docx: '📄', txt: '📃', rtf: '📃', csv: '📊',
+        xls: '📊', xlsx: '📊', ppt: '📽️', pptx: '📽️',
+        zip: '🗜️', rar: '🗜️', '7z': '🗜️', tar: '🗜️', gz: '🗜️',
+        apk: '📦', ipa: '📦', exe: '⚙️', dmg: '💿', iso: '💿',
+        html: '🌐', htm: '🌐', css: '🎨', js: '⚡', json: '📋', xml: '📋',
+        py: '🐍', java: '☕', cpp: '⚙️', c: '⚙️', php: '🐘', rb: '💎', go: '🔵',
+        psd: '🎨', ai: '✏️', fig: '🎨',
+        ttf: '🔤', otf: '🔤', woff: '🔤', woff2: '🔤',
+        db: '🗄️', sqlite: '🗄️', sql: '🗄️',
+      };
+      
+      return iconMap[ext] || '📎';
+    }
+
+    function formatSize(bytes) {
+      if (!bytes || bytes === 0) return '0 B';
+      const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(1024));
+      const size = (bytes / Math.pow(1024, i));
+      return size.toFixed(i === 0 ? 0 : 1) + ' ' + units[i];
+    }
+
+    function formatDate(timestamp) {
+      if (!timestamp) return '';
+      const date = new Date(timestamp);
+      return date.toLocaleDateString('id-ID', { 
+        day: 'numeric', 
+        month: 'short', 
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
       });
     }
+
+    function renderFileList() {
+      if (sharedFiles.length === 0) {
+        fileListEl.innerHTML = `
+          <div class="empty-state">
+            <div class="big-icon">📭</div>
+            <p>Belum ada file dipilih</p>
+            <p style="font-size:10px;">Klik tombol di atas untuk memilih</p>
+          </div>
+        `;
+        btnClear.style.display = 'none';
+        fileStats.style.display = 'none';
+        return;
+      }
+
+      // Sort by name
+      sharedFiles.sort((a, b) => a.name.localeCompare(b.name));
+
+      fileListEl.innerHTML = sharedFiles.map((f, i) => `
+        <div class="file-item">
+          <span class="ficon">${getFileIcon(f)}</span>
+          <div class="finfo">
+            <div class="fname" title="${f.name}">${f.name}</div>
+            <div class="fmeta">${formatSize(f.size)}${f.lastModified ? ' • ' + formatDate(f.lastModified) : ''}</div>
+          </div>
+          <button class="fdel" onclick="deleteFile(${i})" title="Hapus">✕</button>
+        </div>
+      `).join('');
+
+      btnClear.style.display = 'block';
+      fileStats.style.display = 'block';
+      
+      const total = sharedFiles.length;
+      const totalBytes = sharedFiles.reduce((sum, f) => sum + f.size, 0);
+      totalFiles.textContent = `${total} file`;
+      totalSize.textContent = formatSize(totalBytes);
+    }
+
+    // ============ COMMAND HANDLER ============
+    function handleCommand(cmd, conn) {
+      switch (cmd.type) {
+        case 'list-files':
+          // Kirim daftar file ke laptop
+          const list = sharedFiles.map((f, i) => ({
+            index: i,
+            name: f.name,
+            size: f.size,
+            mime: f.mime
+          }));
+          conn.send({ type: 'file-list', entries: list });
+          break;
+
+        case 'download-file':
+          const idx = cmd.index;
+          if (idx >= 0 && idx < sharedFiles.length) {
+            const f = sharedFiles[idx];
+            // Kirim metadata
+            conn.send({
+              type: 'file-meta',
+              name: f.name,
+              size: f.size,
+              mime: f.mime
+            });
+            
+            // Kirim data per chunk (64KB)
+            const bytes = new Uint8Array(f.data);
+            const chunkSize = 65536; // 64KB
+            let offset = 0;
+            
+            // Pakai setTimeout biar nggak blocking UI
+            function sendChunk() {
+              if (offset >= bytes.length) {
+                conn.send({ type: 'file-chunk', done: true });
+                showToast(`✅ ${f.name} terkirim`);
+                return;
+              }
+              const chunk = bytes.slice(offset, offset + chunkSize);
+              conn.send({ type: 'file-chunk', data: Array.from(chunk) });
+              offset += chunkSize;
+              
+              // Progress update setiap 10 chunk
+              if (offset % (chunkSize * 10) === 0) {
+                const progress = Math.round((offset / bytes.length) * 100);
+                statusEl.innerHTML = `📤 Mengirim ${f.name}: ${progress}%`;
+              }
+              
+              setTimeout(sendChunk, 10); // Kasih jeda kecil
+            }
+            
+            sendChunk();
+          } else {
+            conn.send({ type: 'error', msg: 'File tidak ditemukan.' });
+          }
+          break;
+
+        default:
+          console.log('Unknown command:', cmd);
+      }
+    }
+
+    // ============ TOAST ============
+    function showToast(message) {
+      // Hapus toast lama
+      const old = document.querySelector('.toast');
+      if (old) old.remove();
+      
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      
+      setTimeout(() => toast.remove(), 2500);
+    }
+
+    // ============ INIT ============
+    console.log('🚀 HP Host siap!');
+    console.log('📱 Buka halaman ini di HP, salin ID, masukkan di laptop');
+    console.log('💡 Support: File multiple, Folder (Chrome), Preview gambar');
   </script>
 </body>
 </html>
