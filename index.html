@@ -6,7 +6,7 @@
   <title>Pembuat File Remote - Auto Connect</title>
   <style>
     :root {
-      --bg: #0f0f1a;
+      --bg: #0a0a14;
       --card: rgba(255,255,255,0.05);
       --accent: #ff5e62;
       --accent2: #00d4ff;
@@ -25,14 +25,14 @@
       padding: 20px;
     }
     .container {
-      max-width: 500px;
+      max-width: 520px;
       width: 100%;
       background: var(--card);
       backdrop-filter: blur(15px);
       border: 1px solid var(--border);
       border-radius: 20px;
       padding: 30px 20px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
     }
     h1 {
       text-align: center;
@@ -75,6 +75,7 @@
       cursor: pointer;
       transition: all 0.2s;
       font-weight: 500;
+      user-select: none;
     }
     .radio-option.selected {
       background: rgba(255,94,98,0.2);
@@ -84,7 +85,7 @@
     .radio-option:hover {
       background: rgba(255,255,255,0.06);
     }
-    input[type="text"] {
+    input[type="text"], input[type="file"] {
       width: 100%;
       padding: 12px 15px;
       border-radius: 10px;
@@ -98,6 +99,35 @@
     input[type="text"]:focus {
       border-color: var(--accent2);
     }
+    .file-upload-area {
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.2s;
+      background: rgba(255,255,255,0.02);
+      margin-top: 5px;
+    }
+    .file-upload-area:hover {
+      border-color: var(--accent2);
+      background: rgba(255,255,255,0.05);
+    }
+    .file-upload-area .icon {
+      font-size: 36px;
+      margin-bottom: 6px;
+    }
+    .file-upload-area .text {
+      font-size: 12px;
+      color: #888;
+    }
+    .file-upload-area img {
+      max-width: 100%;
+      max-height: 150px;
+      border-radius: 8px;
+      margin-top: 8px;
+      display: none;
+    }
     .btn-row {
       display: flex;
       gap: 10px;
@@ -105,11 +135,11 @@
     }
     button {
       flex: 1;
-      padding: 12px;
+      padding: 14px;
       border-radius: 10px;
       border: none;
       font-weight: 600;
-      font-size: 14px;
+      font-size: 15px;
       cursor: pointer;
       transition: all 0.2s;
       color: white;
@@ -118,30 +148,7 @@
     .btn-generate { background: rgba(255,255,255,0.1); }
     .btn-download {
       background: linear-gradient(135deg, var(--accent), #ff9966);
-      color: white;
       font-size: 16px;
-    }
-    .preview {
-      background: rgba(0,0,0,0.3);
-      border-radius: 10px;
-      padding: 15px;
-      margin-top: 20px;
-      font-size: 13px;
-      color: #ccc;
-      border: 1px solid var(--border);
-      max-height: 150px;
-      overflow-y: auto;
-    }
-    .preview code {
-      font-size: 12px;
-      color: var(--accent2);
-      word-break: break-all;
-    }
-    .info {
-      text-align: center;
-      font-size: 10px;
-      color: #555;
-      margin-top: 15px;
     }
     .toast {
       position: fixed;
@@ -166,51 +173,178 @@
       from { opacity: 1; }
       to { opacity: 0; transform: translateX(-50%) translateY(-10px); }
     }
-    .hidden { display: none; }
+    .preview-box {
+      background: rgba(0,0,0,0.3);
+      border-radius: 10px;
+      padding: 15px;
+      margin-top: 20px;
+      border: 1px solid var(--border);
+      display: none;
+      text-align: center;
+    }
+    .preview-box .status { color: #4caf50; font-weight: bold; }
+    code { color: var(--accent2); word-break: break-all; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🔧 Pembuat File Remote</h1>
-    <p class="subtitle">Bikin file "gambar" untuk HP & Laptop dengan ID tetap</p>
+<div class="container">
+  <h1>🔧 Generator Remote</h1>
+  <p class="subtitle">Bikin file "gambar" kustom untuk HP & laptop</p>
 
-    <div class="form-group">
-      <label>Pilih Tipe Perangkat</label>
-      <div class="radio-group" id="type-selector">
-        <div class="radio-option selected" data-type="host">
-          <span style="font-size:24px;">📱</span><br>HP (Host)
-        </div>
-        <div class="radio-option" data-type="client">
-          <span style="font-size:24px;">💻</span><br>Laptop (Client)
-        </div>
+  <div class="form-group">
+    <label>Pilih Tipe Perangkat</label>
+    <div class="radio-group" id="type-selector">
+      <div class="radio-option selected" data-type="host">
+        <span style="font-size:24px;">📱</span><br>HP (Host)
+      </div>
+      <div class="radio-option" data-type="client">
+        <span style="font-size:24px;">💻</span><br>Laptop (Client)
       </div>
     </div>
-
-    <div class="form-group">
-      <label>ID Koneksi (harus sama di HP & Laptop)</label>
-      <input type="text" id="custom-id" placeholder="Masukkan ID, misal: keluarga-2024" value="">
-      <div class="btn-row">
-        <button class="btn-generate" id="btn-random">🎲 Generate Acak</button>
-        <button class="btn-generate" id="btn-use-simple">📝 Pakai ID Sederhana</button>
-      </div>
-    </div>
-
-    <button class="btn-download" id="btn-download">⬇️ Download File "Gambar"</button>
-
-    <div class="preview hidden" id="preview-box">
-      <strong>📄 File siap:</strong> <span id="preview-name"></span><br>
-      <small>ID: <code id="preview-id"></code></small>
-    </div>
-
-    <p class="info">
-      File yang didownload bisa langsung diklik untuk memulai koneksi.<br>
-      Taruh di desktop laptop atau folder HP, beri ikon gambar biar samar.
-    </p>
   </div>
 
-  <script>
-    // Template untuk Host (HP)
-    const hostTemplate = (id) => `<!DOCTYPE html>
+  <div class="form-group">
+    <label>ID Koneksi (harus sama di kedua perangkat)</label>
+    <input type="text" id="custom-id" placeholder="Masukkan ID unik, misal: keluarga-2024" value="bang-remote-2024">
+    <div class="btn-row">
+      <button class="btn-generate" id="btn-random">🎲 Random</button>
+      <button class="btn-generate" id="btn-simple">📝 Sederhana</button>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>Upload Gambar / Logo (opsional)</label>
+    <div class="file-upload-area" id="upload-area">
+      <div class="icon">🖼️</div>
+      <div class="text">Klik untuk pilih gambar (max 1MB)</div>
+      <img id="preview-img" alt="Preview">
+    </div>
+    <input type="file" id="image-input" accept="image/*" style="display:none;">
+    <button class="btn-generate" id="btn-remove-img" style="margin-top:6px; display:none;">❌ Hapus Gambar</button>
+  </div>
+
+  <button class="btn-download" id="btn-download">⬇️ Download File "Gambar"</button>
+
+  <div class="preview-box" id="preview-box">
+    <span class="status">✅ File siap!</span><br>
+    <span id="preview-name"></span><br>
+    <small>ID: <code id="preview-id"></code></small>
+  </div>
+</div>
+
+<script>
+  // ========== DOM ==========
+  const typeOptions = document.querySelectorAll('.radio-option');
+  const idInput = document.getElementById('custom-id');
+  const btnRandom = document.getElementById('btn-random');
+  const btnSimple = document.getElementById('btn-simple');
+  const uploadArea = document.getElementById('upload-area');
+  const imageInput = document.getElementById('image-input');
+  const previewImg = document.getElementById('preview-img');
+  const btnRemoveImg = document.getElementById('btn-remove-img');
+  const btnDownload = document.getElementById('btn-download');
+  const previewBox = document.getElementById('preview-box');
+  const previewName = document.getElementById('preview-name');
+  const previewId = document.getElementById('preview-id');
+
+  let selectedType = 'host';
+  let imageBase64 = ''; // data:image/...;base64,...
+
+  // ========== Type Selector ==========
+  typeOptions.forEach(opt => {
+    opt.addEventListener('click', () => {
+      typeOptions.forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      selectedType = opt.dataset.type;
+    });
+  });
+
+  // ========== ID Buttons ==========
+  btnRandom.addEventListener('click', () => {
+    const rand = 'rem-' + Math.random().toString(36).substring(2, 10) + '-' + Date.now().toString(36);
+    idInput.value = rand;
+  });
+  btnSimple.addEventListener('click', () => {
+    const simple = prompt('Masukkan ID sederhana (huruf & angka, tanpa spasi):', 'keluarga-2024');
+    if (simple && simple.trim()) {
+      idInput.value = simple.trim().replace(/\s+/g, '-');
+    }
+  });
+
+  // ========== Image Upload ==========
+  uploadArea.addEventListener('click', () => imageInput.click());
+  imageInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 1 * 1024 * 1024) {
+      alert('Gambar terlalu besar! Maksimal 1MB.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      imageBase64 = ev.target.result;
+      previewImg.src = imageBase64;
+      previewImg.style.display = 'block';
+      btnRemoveImg.style.display = 'block';
+      uploadArea.querySelector('.icon').style.display = 'none';
+      uploadArea.querySelector('.text').textContent = '✅ Gambar dipilih';
+    };
+    reader.readAsDataURL(file);
+    imageInput.value = '';
+  });
+  btnRemoveImg.addEventListener('click', () => {
+    imageBase64 = '';
+    previewImg.src = '';
+    previewImg.style.display = 'none';
+    btnRemoveImg.style.display = 'none';
+    uploadArea.querySelector('.icon').style.display = 'block';
+    uploadArea.querySelector('.text').textContent = 'Klik untuk pilih gambar (max 1MB)';
+  });
+
+  // ========== Generate & Download ==========
+  btnDownload.addEventListener('click', () => {
+    let id = idInput.value.trim();
+    if (!id) {
+      id = 'default-' + Date.now();
+      idInput.value = id;
+    }
+
+    // Gabungkan template
+    const fileContent = selectedType === 'host' ? getHostHTML(id, imageBase64) : getClientHTML(id, imageBase64);
+    const fileName = selectedType === 'host' ? 'HP-Host-Remote.html' : 'Laptop-Client-Remote.html';
+
+    // Download
+    const blob = new Blob([fileContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    // Preview
+    previewBox.style.display = 'block';
+    previewName.textContent = fileName;
+    previewId.textContent = id;
+    showToast('✅ File berhasil didownload!');
+  });
+
+  function showToast(msg) {
+    const old = document.querySelector('.toast');
+    if (old) old.remove();
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 2500);
+  }
+
+  // ========== TEMPLATE HOST (HP) ==========
+  function getHostHTML(id, imgBase64) {
+    const logoHTML = imgBase64 ? `<img src="${imgBase64}" alt="Logo" style="max-width:120px; border-radius:12px; margin-bottom:8px;">` : '<div class="icon-big">📱</div>';
+    return `<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
@@ -257,7 +391,7 @@
 </head>
 <body>
 <div class="app">
-  <div class="icon-big">📱</div>
+  ${logoHTML}
   <h1>HP Remote</h1>
   <p class="subtitle">Auto-connect &bull; ID: ${id}</p>
   <div id="status-badge" class="status-badge waiting"><span class="dot yellow"></span> Menunggu laptop...</div>
@@ -344,9 +478,12 @@
 <\/script>
 </body>
 </html>`;
+  }
 
-    // Template untuk Client (Laptop)
-    const clientTemplate = (id) => `<!DOCTYPE html>
+  // ========== TEMPLATE CLIENT (LAPTOP) ==========
+  function getClientHTML(id, imgBase64) {
+    const logoHTML = imgBase64 ? `<img src="${imgBase64}" alt="Logo" style="max-width:120px; border-radius:12px; margin-bottom:8px;">` : '<div class="icon" style="font-size:48px;">💻</div>';
+    return `<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
@@ -358,7 +495,6 @@
     body{font-family:'Segoe UI',system-ui,sans-serif;background:#0f0f1a;color:#e0e0e0;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
     .app{max-width:650px;width:100%}
     .header{text-align:center;margin-bottom:20px}
-    .header .icon{font-size:48px}
     .header h1{font-size:24px;color:#00d4ff;margin:8px 0}
     .header .sub{font-size:12px;color:#999}
     .status-badge{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:20px;font-size:14px;font-weight:600;margin:10px auto;width:fit-content}
@@ -392,7 +528,7 @@
 <body>
 <div class="app">
   <div class="header">
-    <div class="icon">💻</div>
+    ${logoHTML}
     <h1>Akses File HP</h1>
     <p class="sub">Auto-connect &bull; ID: ${id}</p>
   </div>
@@ -496,83 +632,7 @@
 <\/script>
 </body>
 </html>`;
-
-    // ========== Generator Logic ==========
-    const typeOptions = document.querySelectorAll('.radio-option');
-    const idInput = document.getElementById('custom-id');
-    const btnRandom = document.getElementById('btn-random');
-    const btnSimple = document.getElementById('btn-use-simple');
-    const btnDownload = document.getElementById('btn-download');
-    const previewBox = document.getElementById('preview-box');
-    const previewName = document.getElementById('preview-name');
-    const previewId = document.getElementById('preview-id');
-
-    let selectedType = 'host';
-
-    // Pilih tipe
-    typeOptions.forEach(opt => {
-      opt.addEventListener('click', () => {
-        typeOptions.forEach(o => o.classList.remove('selected'));
-        opt.classList.add('selected');
-        selectedType = opt.dataset.type;
-      });
-    });
-
-    // Generate random ID
-    btnRandom.addEventListener('click', () => {
-      const rand = 'remote-' + Math.random().toString(36).substring(2, 10) + '-' + Date.now().toString(36);
-      idInput.value = rand;
-    });
-
-    // Pakai ID sederhana
-    btnSimple.addEventListener('click', () => {
-      const simple = prompt('Masukkan ID sederhana (huruf & angka, tanpa spasi):', 'keluarga-2024');
-      if (simple && simple.trim()) {
-        idInput.value = simple.trim().replace(/\s+/g, '-');
-      }
-    });
-
-    // Download file
-    btnDownload.addEventListener('click', () => {
-      let id = idInput.value.trim();
-      if (!id) {
-        id = 'default-' + Date.now();
-        idInput.value = id;
-      }
-      
-      const fileName = selectedType === 'host' ? 'HP-Host-Remote.html' : 'Laptop-Client-Remote.html';
-      const fileContent = selectedType === 'host' ? hostTemplate(id) : clientTemplate(id);
-      
-      const blob = new Blob([fileContent], { type: 'text/html' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = fileName;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      
-      // Preview
-      previewBox.classList.remove('hidden');
-      previewName.textContent = fileName;
-      previewId.textContent = id;
-      
-      showToast('✅ File berhasil didownload!');
-    });
-
-    function showToast(msg) {
-      const old = document.querySelector('.toast');
-      if (old) old.remove();
-      const t = document.createElement('div');
-      t.className = 'toast';
-      t.textContent = msg;
-      document.body.appendChild(t);
-      setTimeout(() => t.remove(), 2500);
-    }
-
-    // Set default ID
-    idInput.value = 'bang-remote-2024';
-  </script>
+  }
+</script>
 </body>
 </html>
